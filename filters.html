@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Filters — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html" class="active">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Digital Filters</h1>
+        <p class="subtitle">FIR and IIR architectures — the workhorses that shape every digital signal, from the biquad to massive convolution engines.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">FIR</div>
+                <div class="stat-label">Finite Impulse Response</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">IIR</div>
+                <div class="stat-label">Infinite Impulse Response</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Biquad Coefficients</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">50-100&times;</div>
+                <div class="stat-label">IIR Efficiency Advantage</div>
+            </div>
+        </div>
+
+        <h2>Two Families of Filters</h2>
+
+        <div class="explanation">
+            <h4>The Fundamental Choice</h4>
+            <p>Every digital filter falls into one of two families. <strong>FIR</strong> filters use only feedforward paths — the output depends only on current and past inputs. <strong>IIR</strong> filters add feedback — the output also depends on previous outputs. This single architectural decision ripples through every aspect of the filter's behaviour: phase response, stability, computational cost, and implementation complexity.</p>
+        </div>
+
+        <h2>FIR Filters</h2>
+
+        <div class="formula">
+            y[n] = &sum;<sub>k=0</sub><sup>M</sup> b<sub>k</sub> &middot; x[n-k] = b₀x[n] + b₁x[n-1] + ... + b<sub>M</sub>x[n-M]
+            <span class="label">FIR filter: M+1 taps, no feedback</span>
+        </div>
+
+        <div class="explanation">
+            <h4>Characteristics</h4>
+            <ul>
+                <li><strong>Always stable:</strong> No feedback means no poles outside the unit circle (all poles at z=0)</li>
+                <li><strong>Linear phase possible:</strong> Symmetric coefficients give exactly linear phase — zero phase distortion</li>
+                <li><strong>Exact implementation:</strong> No recursion, no accumulated rounding errors, no limit cycles</li>
+                <li><strong>Higher order required:</strong> Typically 10–100× more taps than an equivalent IIR for the same magnitude response</li>
+                <li><strong>Latency:</strong> Linear-phase FIR has group delay of (M-1)/2 samples</li>
+            </ul>
+        </div>
+
+        <div class="explanation">
+            <h4>Typical Tap Counts</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Application</th>
+                        <th>Taps</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Simple smoothing</td>
+                        <td>5–15</td>
+                        <td>Gentle roll-off sufficient</td>
+                    </tr>
+                    <tr>
+                        <td>Audio equaliser (linear-phase)</td>
+                        <td>128–512</td>
+                        <td>Sharp bands, no phase distortion</td>
+                    </tr>
+                    <tr>
+                        <td>Sample rate converter</td>
+                        <td>64–256 per phase</td>
+                        <td>High stopband rejection</td>
+                    </tr>
+                    <tr>
+                        <td>Convolution reverb</td>
+                        <td>48,000–96,000+</td>
+                        <td>1–2 second room impulse at 48 kHz</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="analogy">
+            <p>An FIR filter is like a moving spotlight on a conveyor belt. At each tick, you shine the spotlight on the most recent M items, assign a weight to each based on its position, multiply, and sum. The beam never looks backward at old totals — only at the raw items on the belt. Simple, predictable, but you need a wide beam (many taps) to be very selective.</p>
+        </div>
+
+        <h2>IIR Filters</h2>
+
+        <div class="formula">
+            y[n] = &sum;<sub>k=0</sub><sup>M</sup> b<sub>k</sub>x[n-k] - &sum;<sub>k=1</sub><sup>N</sup> a<sub>k</sub>y[n-k]
+            <span class="label">IIR filter: feedback from previous outputs</span>
+        </div>
+
+        <div class="explanation">
+            <h4>Characteristics</h4>
+            <ul>
+                <li><strong>Efficiency:</strong> Achieves sharp cutoffs with far fewer coefficients (a 4th-order IIR ≈ 800-tap FIR)</li>
+                <li><strong>Potential instability:</strong> Feedback means poles can lie outside the unit circle if coefficients are wrong</li>
+                <li><strong>Non-linear phase:</strong> Generally, IIR filters distort the phase relationship between frequencies</li>
+                <li><strong>Infinite impulse response:</strong> The output of an IIR to an impulse rings forever (exponentially decaying)</li>
+                <li><strong>Fixed-point issues:</strong> Quantisation of coefficients and intermediate values can cause limit cycles and overflow</li>
+            </ul>
+        </div>
+
+        <h3>The Biquad: Universal Building Block</h3>
+
+        <div class="explanation">
+            <h4>Second-Order Sections</h4>
+            <p>The biquad (bi-quadratic) is a 2nd-order IIR filter with 5 coefficients. It's the universal building block for IIR implementation because:</p>
+            <ul>
+                <li>Any higher-order IIR is factored into cascaded biquads (reducing sensitivity to coefficient quantisation)</li>
+                <li>Complex pole/zero pairs naturally form 2nd-order sections</li>
+                <li>Parametric equalisers, crossovers, and tone controls are single biquads</li>
+                <li>Hardware DSPs optimise for biquad computation</li>
+            </ul>
+        </div>
+
+        <div class="formula">
+            H(z) = (b₀ + b₁z⁻¹ + b₂z⁻²) / (1 + a₁z⁻¹ + a₂z⁻²)
+            <span class="label">Biquad transfer function — 5 coefficients define the complete filter</span>
+        </div>
+
+        <div class="analogy">
+            <p>The biquad is to audio DSP what the LEGO brick is to construction. A single brick isn't much — it gives you one resonant peak or notch. But snap six together in series and you have a precision 12th-order crossover. The beauty is that each brick is small enough to understand completely, and the cascade is just the product of their transfer functions.</p>
+        </div>
+
+        <h2>FIR vs. IIR: The Trade-off</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Criterion</th>
+                    <th>FIR</th>
+                    <th>IIR</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Stability</td>
+                    <td>Always stable</td>
+                    <td>Can be unstable</td>
+                </tr>
+                <tr>
+                    <td>Phase</td>
+                    <td>Exactly linear (symmetric)</td>
+                    <td>Non-linear (generally)</td>
+                </tr>
+                <tr>
+                    <td>Order for sharp cutoff</td>
+                    <td>High (100s of taps)</td>
+                    <td>Low (4–12 coefficients)</td>
+                </tr>
+                <tr>
+                    <td>Computation per sample</td>
+                    <td>M+1 multiplies</td>
+                    <td>M+N+1 multiplies (much fewer total)</td>
+                </tr>
+                <tr>
+                    <td>Latency</td>
+                    <td>High (linear-phase: (M-1)/2)</td>
+                    <td>Low (typically < 1 ms)</td>
+                </tr>
+                <tr>
+                    <td>Quantisation effects</td>
+                    <td>Benign</td>
+                    <td>Limit cycles, overflow possible</td>
+                </tr>
+                <tr>
+                    <td>Adaptability</td>
+                    <td>Easy (LMS, RLS algorithms)</td>
+                    <td>Harder (stability constraints)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="explanation">
+            <h4>Concrete Example</h4>
+            <p>Sharp lowpass filter: 1 kHz cutoff, 48 kHz sample rate, 80 dB stopband attenuation, 100 Hz transition band:</p>
+            <ul>
+                <li><strong>FIR:</strong> ~800–1,000 taps. At 48 kHz, that's 800 multiplications per sample = 38.4 million multiplies/second. Latency: ~8.3 ms.</li>
+                <li><strong>IIR (elliptic):</strong> 8th–10th order = 16–20 coefficients. ~20 multiplies per sample = 960,000 multiplies/second. Latency: < 0.2 ms.</li>
+                <li><strong>Ratio:</strong> 40–50× fewer multiplications for IIR. But the FIR has perfect linear phase.</li>
+            </ul>
+        </div>
+
+        <h2>Implementation Structures</h2>
+
+        <div class="explanation">
+            <h4>Direct Form I</h4>
+            <p>Implements the difference equation as written: separate delay lines for input and output. Uses 2(M+N) delay elements. Straightforward but requires more memory.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Direct Form II (Transposed)</h4>
+            <p>Shares delay elements between feedforward and feedback paths. Uses only max(M,N) delays — half the memory. This is the standard biquad implementation.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Cascade (Series) Form</h4>
+            <p>Factors H(z) into a cascade of 2nd-order sections (biquads). Each section is implemented independently. Benefits: lower coefficient sensitivity, better numerical behaviour, easier tuning of individual frequency bands.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Parallel Form</h4>
+            <p>Decomposes H(z) via partial fractions into parallel 2nd-order sections whose outputs are summed. Benefits: each section can saturate independently without affecting others — useful in fixed-point implementations.</p>
+        </div>
+
+        <h2>Linear Phase</h2>
+
+        <div class="explanation">
+            <h4>Why Phase Matters</h4>
+            <p>A linear-phase filter delays all frequencies by the same amount (constant group delay). This preserves the shape of waveforms passing through — critical for audio (preserves transients), data communications (preserves pulse shape), and medical signals (preserves ECG morphology). Non-linear phase means different frequencies arrive at different times, smearing transients.</p>
+            <p>FIR filters achieve linear phase by making coefficients symmetric: b[k] = b[M-k]. This constraint halves the number of free parameters but guarantees zero phase distortion.</p>
+        </div>
+
+        <div class="speculation-box">
+            <p>The FIR/IIR dichotomy is clean in theory but blurs in practice. "Truncated IIR" designs run an IIR for a fixed number of steps then zero the state — getting IIR-like efficiency with bounded-time behaviour. Conversely, "warped FIR" filters use allpass-chain delay elements to get variable frequency resolution while maintaining FIR stability. As processing power becomes less constrained, is the computational advantage of IIR still relevant? On modern hardware, a 1024-tap FIR at 48 kHz is trivial. The real battleground may shift from "how few multiplies?" to "how low can we make latency while maintaining perceptual quality?"</p>
+            <p class="caveat">For embedded/battery-powered DSP (hearing aids, IoT sensors), the IIR efficiency advantage remains critical. Power consumption scales linearly with MAC (multiply-accumulate) operations, making the 50:1 ratio still meaningful at microwatt scales.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Can machine learning discover filter structures that don't fit the FIR/IIR taxonomy but offer new points on the phase/efficiency/latency trade-off surface?</li>
+                <li>What is the minimum-latency filter that achieves a given magnitude specification with perceptually indistinguishable phase distortion?</li>
+                <li>How should filter implementations adapt for neuromorphic hardware where computation is event-driven rather than clocked?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="z-transform.html">&larr; Z-Transform</a>
+            <a href="filter-design.html" class="next">Filter Design Methods &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Digital Filters</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sampling & Aliasing — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html" class="active">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Sampling & Aliasing</h1>
+        <p class="subtitle">The bridge between continuous and discrete — Nyquist's theorem, what happens when you break it, and how to get perfect reconstruction.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">1928</div>
+                <div class="stat-label">Nyquist's Paper</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">1949</div>
+                <div class="stat-label">Shannon's Proof</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">2f<sub>max</sub></div>
+                <div class="stat-label">Minimum Sample Rate</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">44,100</div>
+                <div class="stat-label">CD Audio (Hz)</div>
+            </div>
+        </div>
+
+        <h2>The Sampling Theorem</h2>
+
+        <div class="explanation">
+            <h4>The Most Important Theorem in DSP</h4>
+            <p>If a continuous-time signal x(t) contains no frequencies higher than f<sub>max</sub> Hz, then it can be perfectly reconstructed from samples taken at a rate f<sub>s</sub> &ge; 2f<sub>max</sub>. This minimum rate — 2f<sub>max</sub> — is the Nyquist rate. Below it, information is irreversibly lost.</p>
+            <p>Harry Nyquist established the concept in 1928; Claude Shannon proved it rigorously in 1949 and showed how reconstruction works via the sinc interpolation formula.</p>
+        </div>
+
+        <div class="formula">
+            f<sub>s</sub> &ge; 2 &middot; f<sub>max</sub>
+            <span class="label">Nyquist-Shannon Sampling Theorem</span>
+        </div>
+
+        <div class="formula">
+            x(t) = &sum;<sub>n=-&infin;</sub><sup>&infin;</sup> x[n] &middot; sinc((t - nT)/T)
+            <span class="label">Shannon's reconstruction formula (sinc interpolation)</span>
+        </div>
+
+        <div class="analogy">
+            <p>Imagine filming a spinning wheel. If you take 24 frames per second and the wheel spins at 12 revolutions per second, you need at least 24 fps to see the motion correctly (each revolution needs at least 2 frames). Film at fewer fps and the wheel appears to spin backwards — that's aliasing. The Nyquist theorem tells you exactly how many "frames" you need to capture a signal without visual illusions.</p>
+        </div>
+
+        <h2>Why 44.1 kHz?</h2>
+
+        <div class="explanation">
+            <h4>The CD Standard</h4>
+            <p>Human hearing ranges from roughly 20 Hz to 20 kHz. Applying Nyquist: we need at least 40,000 samples per second. The CD standard chose 44,100 Hz — slightly above the minimum — to allow room for a practical anti-aliasing filter's transition band (the filter can't cut off infinitely sharply at 20 kHz). The extra 2,050 Hz on each side gives the filter room to roll off from passband to stopband.</p>
+            <p>The specific number 44,100 also had a practical origin: it's evenly divisible by common video frame rates (44100 = 2&sup2; &times; 3&sup2; &times; 5&sup2; &times; 7&sup2;), which mattered when early digital audio was stored on video tape.</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Application</th>
+                    <th>Sample Rate</th>
+                    <th>Bandwidth</th>
+                    <th>Why</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Telephone</td>
+                    <td>8,000 Hz</td>
+                    <td>300–3,400 Hz</td>
+                    <td>Voice intelligibility only</td>
+                </tr>
+                <tr>
+                    <td>CD Audio</td>
+                    <td>44,100 Hz</td>
+                    <td>20–20,000 Hz</td>
+                    <td>Full human hearing range</td>
+                </tr>
+                <tr>
+                    <td>Professional Audio</td>
+                    <td>48,000 Hz</td>
+                    <td>20–22,000 Hz</td>
+                    <td>Broadcast/film standard</td>
+                </tr>
+                <tr>
+                    <td>Hi-Res Audio</td>
+                    <td>96,000 Hz</td>
+                    <td>20–45,000 Hz</td>
+                    <td>More filter headroom, ultrasonic capture</td>
+                </tr>
+                <tr>
+                    <td>Ultrasound</td>
+                    <td>20–140 MHz</td>
+                    <td>2–20 MHz</td>
+                    <td>Medical imaging transducers</td>
+                </tr>
+                <tr>
+                    <td>Modern Radar</td>
+                    <td>1–6 GSPS</td>
+                    <td>100s MHz to GHz</td>
+                    <td>Direct RF sampling</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Aliasing: When Sampling Goes Wrong</h2>
+
+        <div class="explanation">
+            <h4>Spectral Folding</h4>
+            <p>When you sample below the Nyquist rate, high-frequency components "fold back" into the lower-frequency region, masquerading as frequencies that weren't in the original signal. A 15 kHz tone sampled at 20 kHz appears as a 5 kHz tone. The original frequency is gone — aliasing is irreversible.</p>
+            <p>Mathematically, sampling multiplies the signal's spectrum by a train of impulses spaced at f<sub>s</sub>. This replicates the spectrum at every multiple of f<sub>s</sub>. If the original spectrum exceeds f<sub>s</sub>/2, these replicas overlap — that overlap is aliasing.</p>
+        </div>
+
+        <div class="formula">
+            f<sub>alias</sub> = |f<sub>signal</sub> - k &middot; f<sub>s</sub>|, &nbsp; where k = round(f<sub>signal</sub>/f<sub>s</sub>)
+            <span class="label">Aliased frequency calculation</span>
+        </div>
+
+        <div class="analogy">
+            <p>Aliasing is like a photograph of a brick wall taken from a moving car. If the camera's shutter speed doesn't "sample" fast enough, the repeating pattern of bricks creates strange moiré patterns — fake low-frequency stripes that aren't on the actual wall. The true high-frequency detail (individual bricks) has folded into a phantom low frequency (the moiré bands).</p>
+        </div>
+
+        <h2>Anti-Aliasing Filters</h2>
+
+        <div class="explanation">
+            <h4>Prevention, Not Cure</h4>
+            <p>Since aliasing is irreversible once sampling occurs, we must prevent it BEFORE the ADC. An anti-aliasing filter is a lowpass filter placed before the sampler that removes all energy above f<sub>s</sub>/2. In practice, this means the filter must transition from passband to full stopband within the narrow gap between the highest desired frequency and f<sub>s</sub>/2.</p>
+            <p>For CD audio: pass everything below 20 kHz, reject everything above 22.05 kHz. That's only a 2,050 Hz transition band — tight enough to require a high-order analogue filter (typically 7th–9th order elliptic).</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Oversampling: The Modern Solution</h4>
+            <p>Modern ADCs solve the steep-filter problem by oversampling: sampling at a much higher rate (e.g., 64× or 256× the final rate), then using a digital decimation filter to reduce back to the target rate. Because the initial sample rate is so high, the analogue anti-aliasing filter can be gentle (a simple first-order RC filter suffices). The hard work shifts to the digital domain where sharp filters are cheap and precise.</p>
+        </div>
+
+        <div class="analogy">
+            <p>An anti-aliasing filter is like a velvet rope at a concert venue. You can't un-crowd a mosh pit once everyone's inside (aliasing), but you CAN check tickets at the door (filter) and only let in the frequencies that belong. Oversampling is like making the venue 64× larger — now a simple rope is enough because there's so much extra space that nobody crowds the wrong section.</p>
+        </div>
+
+        <h2>Reconstruction</h2>
+
+        <div class="explanation">
+            <h4>From Samples Back to Continuous</h4>
+            <p>Shannon's interpolation formula says: place a sinc function at each sample, scale it by the sample value, and sum. The infinite tails of each sinc fill in the gaps between samples perfectly. In practice, we use a DAC (Digital-to-Analogue Converter) followed by a reconstruction lowpass filter that smooths the staircase output into the continuous signal.</p>
+            <p>Modern DACs also use oversampling: they upsample the signal digitally (inserting zeros and filtering), then convert at a high rate, making the analogue reconstruction filter trivial.</p>
+        </div>
+
+        <div class="formula">
+            sinc(x) = sin(&pi;x) / (&pi;x)
+            <span class="label">The sinc function — ideal interpolation kernel</span>
+        </div>
+
+        <h2>Quantisation</h2>
+
+        <div class="explanation">
+            <h4>The Other Sampling Decision</h4>
+            <p>Sampling discretises time; quantisation discretises amplitude. An N-bit ADC maps the continuous voltage range into 2<sup>N</sup> discrete levels. A 16-bit converter (CD standard) has 65,536 levels — a dynamic range of about 96 dB. A 24-bit converter gives 16,777,216 levels and 144 dB of theoretical dynamic range.</p>
+        </div>
+
+        <div class="formula">
+            SNR<sub>quantisation</sub> &asymp; 6.02N + 1.76 dB
+            <span class="label">Quantisation noise floor for N-bit uniform quantiser</span>
+        </div>
+
+        <div class="analogy">
+            <p>Quantisation is like measuring height with a ruler that only has markings every centimetre. A person who is 175.3 cm gets rounded to 175 cm — the 0.3 cm error is quantisation noise. More bits is like adding millimetre markings: finer resolution, less rounding error, more faithful representation.</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Bit Depth</th>
+                    <th>Levels</th>
+                    <th>Dynamic Range</th>
+                    <th>Typical Use</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>8-bit</td>
+                    <td>256</td>
+                    <td>~48 dB</td>
+                    <td>Telephony, old games</td>
+                </tr>
+                <tr>
+                    <td>16-bit</td>
+                    <td>65,536</td>
+                    <td>~96 dB</td>
+                    <td>CD audio</td>
+                </tr>
+                <tr>
+                    <td>24-bit</td>
+                    <td>16.7M</td>
+                    <td>~144 dB</td>
+                    <td>Professional recording</td>
+                </tr>
+                <tr>
+                    <td>32-bit float</td>
+                    <td>~4.3B</td>
+                    <td>~1,528 dB</td>
+                    <td>Internal processing</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="speculation-box">
+            <p>Sigma-delta (&Sigma;&Delta;) modulation has become the dominant ADC architecture for precision applications, trading bit depth for extreme oversampling rates (1-bit at 64× to 256× the output rate). As clock speeds continue to increase, the boundary between analogue and digital blurs further. Could future ADCs operate at optical clock rates, directly sampling terahertz signals? The information-theoretic limits are clear (Shannon's formula), but the engineering challenges of jitter, power, and thermal noise at those speeds remain formidable.</p>
+            <p class="caveat">Current state-of-the-art ADCs achieve ~6 GSPS at 12-bit resolution. Terahertz-rate sampling remains theoretical, limited by aperture jitter (~50 femtoseconds in best devices) and fundamental thermal noise floors.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Can compressed sensing circumvent the Nyquist limit for signals known to be sparse — and if so, what are the practical limits for real-time implementations?</li>
+                <li>As AI-based signal reconstruction improves, will "perceptual sampling" (sampling below Nyquist but using learned priors for reconstruction) become viable for non-critical applications?</li>
+                <li>What is the fundamental energy cost per bit of information extracted from a continuous signal, and how close are current ADCs to that limit?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="fundamentals.html">&larr; Signals & Systems</a>
+            <a href="fourier.html" class="next">Fourier Transform &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Sampling & Aliasing</p>
+    </footer>
+</body>
+</html>

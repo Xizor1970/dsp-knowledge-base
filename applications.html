@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html" class="active">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Applications</h1>
+        <p class="subtitle">Where theory meets hardware — audio, communications, medical imaging, radar, and the new frontier of AI-driven signal processing.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">5G</div>
+                <div class="stat-label">400 MHz Bandwidth</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">128 GFLOPS</div>
+                <div class="stat-label">TI C6678 DSP</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">0.05 Hz</div>
+                <div class="stat-label">ECG High-Pass</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">6 GSPS</div>
+                <div class="stat-label">Modern Radar ADC</div>
+            </div>
+        </div>
+
+        <h2>Audio Processing</h2>
+
+        <div class="explanation">
+            <h4>The Chain from Microphone to Speaker</h4>
+            <p>Modern audio relies on DSP at every stage: microphone preamps with digital gain, ADC oversampling, noise reduction, equalization, dynamic compression, spatial processing (reverb, panning, binaural), sample rate conversion, and DAC oversampling with noise shaping. A typical smartphone processes audio through 20+ DSP stages between microphone and speaker.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Audio Coding: MP3, AAC, Opus</h4>
+            <p>Audio codecs use DSP to compress music by 10–12× with minimal perceptual loss. The pipeline: polyphase filter bank splits audio into 32 subbands → MDCT (Modified Discrete Cosine Transform) gives fine frequency resolution → psychoacoustic model identifies masked components → quantize/encode only what's audible. MP3 uses a 576-point MDCT; AAC uses 1024/128 switching; Opus combines SILK (voice) with CELT (music) based on signal content.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Noise Cancellation</h4>
+            <p>Active noise cancellation (ANC) in headphones uses adaptive FIR filters (typically 128–512 taps) running the LMS algorithm at 48 kHz. A reference microphone captures external noise; the filter generates an anti-phase signal to cancel it at the ear. Feedforward ANC handles broadband noise; feedback handles low-frequency resonance. Modern ANC achieves 25–40 dB reduction below 1 kHz with &lt; 10 ms latency.</p>
+        </div>
+
+        <div class="analogy">
+            <p>Audio DSP is like a sound engineer who never sleeps, never gets tired, and can adjust 10,000 knobs simultaneously in real time. The analog engineer of the 1960s fought with solder and capacitors to shape sound; the DSP engineer types coefficients and achieves perfection that no physical component can match — and can update those coefficients a thousand times per second.</p>
+        </div>
+
+        <h2>Wireless Communications</h2>
+
+        <div class="explanation">
+            <h4>OFDM: The Foundation of Modern Wireless</h4>
+            <p>4G LTE, 5G NR, Wi-Fi, and DVB-T all use Orthogonal Frequency Division Multiplexing (OFDM). The transmitter takes data, maps it to hundreds or thousands of closely-spaced subcarriers, and transforms to time domain via IFFT. The receiver does the inverse: FFT to recover subcarrier data. A 20 MHz LTE channel uses a 2048-point FFT with 1200 active subcarriers, each carrying its own QAM symbol. The cyclic prefix (guard interval) makes this robust to multipath — no equaliser needed per subcarrier.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>5G NR: Pushing the Boundaries</h4>
+            <p>5G NR (New Radio) operates from 600 MHz to 52 GHz with channel bandwidths up to 400 MHz (mmWave FR2). At 400 MHz bandwidth, the ADC samples at ~800 MSPS or higher. DSP challenges include: massive MIMO beamforming (64–256 antenna elements, each needing independent channel estimation), carrier aggregation across multiple bands, and sub-millisecond latency requirements for URLLC (Ultra-Reliable Low Latency Communication).</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Standard</th>
+                    <th>Bandwidth</th>
+                    <th>FFT Size</th>
+                    <th>Key DSP Challenge</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Wi-Fi 6 (802.11ax)</td>
+                    <td>20–160 MHz</td>
+                    <td>256–2048</td>
+                    <td>OFDMA scheduling, 1024-QAM</td>
+                </tr>
+                <tr>
+                    <td>LTE</td>
+                    <td>1.4–20 MHz</td>
+                    <td>128–2048</td>
+                    <td>MIMO detection, turbo decoding</td>
+                </tr>
+                <tr>
+                    <td>5G FR1</td>
+                    <td>5–100 MHz</td>
+                    <td>512–4096</td>
+                    <td>Massive MIMO, beam management</td>
+                </tr>
+                <tr>
+                    <td>5G FR2 (mmWave)</td>
+                    <td>50–400 MHz</td>
+                    <td>2048–4096</td>
+                    <td>Phase noise, beam tracking, PA linearisation</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Medical Signal Processing</h2>
+
+        <div class="explanation">
+            <h4>ECG: Preserving Diagnostic Morphology</h4>
+            <p>Electrocardiogram processing operates in the 0.05–150 Hz band. The high-pass at 0.05 Hz (not higher!) prevents baseline wander while preserving the ST segment — a critical diagnostic marker for cardiac ischemia. The AHA mandates linear-phase filtering to prevent waveform distortion. A 50/60 Hz notch filter removes power-line interference. Modern 12-lead ECG machines compute QRS detection, heart rate variability, and arrhythmia classification in real time.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>EEG: Sub-Hz to 100 Hz</h4>
+            <p>Electroencephalography captures brain waves across five bands: Delta (0.5–4 Hz, deep sleep), Theta (4–8 Hz, drowsiness), Alpha (8–13 Hz, relaxed wakefulness), Beta (13–30 Hz, active thinking), and Gamma (30–100 Hz, higher cognition). DSP challenges include: removing eye-blink artefacts (ICA — Independent Component Analysis), rejecting muscle contamination, and computing spectral power in each band with sufficient time resolution to track state changes.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Medical Ultrasound</h4>
+            <p>Ultrasound imaging uses transducers operating at 2–20 MHz with ADCs sampling at 20–140 MHz. DSP performs beamforming (delaying and summing across array elements to focus the beam), envelope detection (Hilbert transform), scan conversion (polar to Cartesian), and speckle reduction. Modern systems beamform 128–256 channels in real time, requiring hundreds of billions of operations per second.</p>
+        </div>
+
+        <h2>Radar and Sonar</h2>
+
+        <div class="explanation">
+            <h4>Pulse Compression</h4>
+            <p>Modern radar transmits a long, frequency-modulated chirp pulse and compresses it on receive via matched filtering (correlation with the transmitted waveform). This achieves the range resolution of a short pulse with the energy of a long one. A 10 &mu;s chirp with 10 MHz bandwidth gives 15 m range resolution — the same as a 100 ns pulse but with 100× more energy, extending detection range.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Doppler Processing</h4>
+            <p>By computing the FFT across multiple returns from the same range bin (slow-time FFT), radar extracts target velocity via the Doppler shift. A 1 GHz radar detecting a car at 100 km/h sees a Doppler shift of ~185 Hz. The FFT resolves this from clutter and noise, enabling simultaneous range and velocity measurement (the range-Doppler map).</p>
+        </div>
+
+        <h2>Image Processing</h2>
+
+        <div class="explanation">
+            <h4>2D DSP</h4>
+            <p>Image processing is 2D signal processing. The 2D DFT decomposes images into spatial frequencies. Filtering in the spatial frequency domain removes noise, enhances edges, or compresses data. JPEG uses the 2D DCT (Discrete Cosine Transform) on 8×8 blocks. MRI reconstructs images from k-space (spatial frequency data) via 2D/3D inverse FFT. CT reconstruction uses filtered back-projection — convolution (filtering) along each projection angle followed by summation.</p>
+        </div>
+
+        <h2>The DSP Hardware Landscape</h2>
+
+        <div class="explanation">
+            <h4>From Dedicated Chips to Heterogeneous Compute</h4>
+            <p>The first DSP chip (TI TMS32010, 1982) ran at 5 MIPS. Modern DSPs like the TI C6678 deliver 128 GFLOPS across 8 cores at 10 watts — a 25,000× improvement. But dedicated DSP chips now share the landscape with:</p>
+            <ul>
+                <li><strong>FPGAs:</strong> Massively parallel, deterministic latency. Used in radar, 5G baseband, high-frequency trading. Thousands of MAC units running at 500+ MHz.</li>
+                <li><strong>GPUs:</strong> Thousands of cores optimised for parallel floating-point. Dominant in offline audio/video processing and ML inference.</li>
+                <li><strong>Application-specific cores:</strong> Apple's M-series Neural Engine, Qualcomm's Hexagon DSP, Google's TPU — optimised for specific signal processing + AI workloads.</li>
+            </ul>
+        </div>
+
+        <div class="speculation-box">
+            <p>The boundary between classical DSP and deep learning is dissolving. Speech enhancement, echo cancellation, beamforming, and channel estimation are all being reimplemented as neural networks trained end-to-end on real-world data. These learned systems often outperform hand-designed DSP, especially in non-stationary environments where classical assumptions (stationarity, Gaussianity, linearity) fail. But they sacrifice interpretability, worst-case guarantees, and formal stability proofs. The next decade likely brings a synthesis: hybrid systems where classical DSP handles the structured, safety-critical core while neural networks handle the messy real-world adaptation layer.</p>
+            <p class="caveat">Regulatory frameworks in medical devices and aviation still require explainable, verifiable signal processing — limiting pure neural approaches in those domains. The convergence is happening fastest in consumer electronics (noise cancellation, voice assistants) where regulatory constraints are lighter.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Will general-purpose AI accelerators make dedicated DSP chips obsolete, or will the deterministic latency requirements of real-time processing always demand specialised hardware?</li>
+                <li>Can we develop formal verification methods for neural network-based signal processing that provide the same safety guarantees as classical filter stability analysis?</li>
+                <li>As 6G research targets terahertz frequencies (100 GHz – 10 THz), what fundamentally new DSP challenges arise from operating at these speeds?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="multirate.html">&larr; Multirate Processing</a>
+            <a href="animations.html" class="next">Interactive Animations &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Applications</p>
+    </footer>
+</body>
+</html>

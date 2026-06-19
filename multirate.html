@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multirate Processing — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html" class="active">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Multirate Processing</h1>
+        <p class="subtitle">Decimation, interpolation, polyphase magic — changing sample rates efficiently and why your audio DAC runs at 384 kHz.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">&darr;M</div>
+                <div class="stat-label">Decimation (Downsample)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">&uarr;L</div>
+                <div class="stat-label">Interpolation (Upsample)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">M&times;</div>
+                <div class="stat-label">Polyphase Efficiency Gain</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">256&times;</div>
+                <div class="stat-label">Typical &Sigma;&Delta; Oversampling</div>
+            </div>
+        </div>
+
+        <h2>Why Change Sample Rates?</h2>
+
+        <div class="explanation">
+            <h4>The Practical Necessity</h4>
+            <p>Different systems run at different rates: CD audio is 44.1 kHz, video is 48 kHz, Bluetooth is 16 kHz, and your USB DAC may output at 384 kHz. Connecting these requires sample rate conversion. Beyond interconnection, changing rates within a processing chain saves computation — if you only need bandwidth up to 100 Hz, why process at 48 kHz? Decimate to 250 Hz, process cheaply, then interpolate back up.</p>
+        </div>
+
+        <h2>Decimation (Downsampling)</h2>
+
+        <div class="explanation">
+            <h4>Reducing the Rate by Factor M</h4>
+            <p>Decimation keeps every M-th sample and discards the rest: y[n] = x[nM]. But you can't just throw samples away — that would alias. First, lowpass filter to bandwidth &pi;/M (removing all energy that would fold back), THEN downsample. The anti-aliasing filter before decimation is critical.</p>
+            <ul>
+                <li><strong>Effect on spectrum:</strong> Bandwidth contracts by 1/M; Nyquist frequency drops by M</li>
+                <li><strong>Filter requirement:</strong> Stopband edge at &pi;/M (or f<sub>s</sub>/(2M) in Hz)</li>
+                <li><strong>Computation:</strong> Naive approach filters at full rate then discards — wasteful. Polyphase does better.</li>
+            </ul>
+        </div>
+
+        <div class="formula">
+            y[n] = (h * x)[nM] = &sum;<sub>k</sub> h[k] &middot; x[nM - k]
+            <span class="label">Decimation: filter then keep every M-th sample</span>
+        </div>
+
+        <h2>Interpolation (Upsampling)</h2>
+
+        <div class="explanation">
+            <h4>Increasing the Rate by Factor L</h4>
+            <p>Interpolation inserts L-1 zeros between each sample (zero-stuffing), then lowpass filters to remove the spectral images created by the stuffing. The filter interpolates the "missing" values — filling in the gaps between original samples with mathematically correct intermediate values.</p>
+            <ul>
+                <li><strong>Zero-stuffing:</strong> x<sub>up</sub>[n] = x[n/L] if n is multiple of L, else 0</li>
+                <li><strong>Filter:</strong> Lowpass with cutoff &pi;/L, gain L (to compensate for zero-stuffing energy loss)</li>
+                <li><strong>Effect:</strong> Original spectrum unchanged; rate increased by L; new higher frequencies are interpolated</li>
+            </ul>
+        </div>
+
+        <div class="analogy">
+            <p>Decimation is like watching a film at 2× speed by showing only every other frame — you see the broad motion but lose fast details. If someone runs past in one frame, you might miss them (aliasing). The lowpass filter before decimation is like adding motion blur — it smooths away details too fast for the reduced frame rate, preventing temporal aliasing. Interpolation is like frame interpolation in modern TVs — creating in-between frames that weren't filmed, inferring smooth motion from the originals.</p>
+        </div>
+
+        <h2>Polyphase Decomposition</h2>
+
+        <div class="explanation">
+            <h4>The Efficiency Breakthrough</h4>
+            <p>Computing a full-rate filter then discarding samples (decimation) or computing on mostly-zero samples (interpolation) wastes cycles. Polyphase decomposition restructures the computation to operate at the LOWER rate.</p>
+            <p>Split the filter h[n] into M sub-filters (phases), each containing every M-th coefficient: e<sub>k</sub>[n] = h[nM + k], for k = 0, 1, ..., M-1. Each phase filter runs at 1/M the rate and processes only the samples that survive decimation.</p>
+            <ul>
+                <li><strong>Decimation:</strong> M polyphase filters each run at output rate → total computation reduced by factor M</li>
+                <li><strong>Interpolation:</strong> L polyphase filters each produce one output sample per input → computation at input rate</li>
+                <li><strong>Savings:</strong> Exactly M× fewer multiplications than the naive approach</li>
+            </ul>
+        </div>
+
+        <div class="formula">
+            H(z) = &sum;<sub>k=0</sub><sup>M-1</sup> z<sup>-k</sup> &middot; E<sub>k</sub>(z<sup>M</sup>)
+            <span class="label">Polyphase decomposition of filter H(z) into M phases</span>
+        </div>
+
+        <div class="analogy">
+            <p>Polyphase is like a car assembly line with M workstations. Instead of one worker doing all the steps on every car (then scrapping 3 out of 4 cars), assign each worker one car — they only do the steps relevant to that car's final output. Same result, M× less wasted work.</p>
+        </div>
+
+        <h2>Rational Rate Conversion</h2>
+
+        <div class="explanation">
+            <h4>Converting 44.1 kHz ↔ 48 kHz</h4>
+            <p>When the ratio isn't an integer (like 44100/48000 = 147/160), you combine interpolation by L and decimation by M: upsample by 160, filter, then decimate by 147. The polyphase structure makes this efficient — you never actually compute 160× the original rate. Modern implementations use Farrow structures (polynomial interpolation) for arbitrary real-valued rate ratios, handling any conversion without integer constraints.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Cascaded Integrator-Comb (CIC) Filters</h4>
+            <p>For large decimation ratios (like 64× or 256× in sigma-delta converters), CIC filters are the workhorse. They require NO multiplications — only additions and subtractions — making them ideal for high-speed hardware. The trade-off is a drooping passband (sinc<sup>N</sup> shape) that needs compensation filtering. CIC followed by a short FIR compensator is the standard architecture in oversampled ADCs.</p>
+        </div>
+
+        <h2>Oversampling DACs and ADCs</h2>
+
+        <div class="explanation">
+            <h4>Why Your DAC Runs at 384 kHz</h4>
+            <p>A sigma-delta DAC takes 44.1 kHz PCM audio, digitally upsamples to 256× (11.29 MHz), noise-shapes and quantises to a 1-bit stream, then converts this simple on/off stream with a trivial analogue filter. The extreme oversampling pushes quantisation noise to ultrasonic frequencies where a gentle analogue filter removes it. Benefits:</p>
+            <ul>
+                <li>Analogue reconstruction filter can be a simple first-order RC (instead of 9th-order elliptic)</li>
+                <li>Component tolerance requirements are relaxed</li>
+                <li>All the precision lives in the digital domain where it's cheap and exact</li>
+            </ul>
+        </div>
+
+        <h2>Filter Banks</h2>
+
+        <div class="explanation">
+            <h4>Parallel Multirate Structures</h4>
+            <p>A filter bank splits a signal into multiple frequency bands, each decimated to its own appropriate rate. Processing occurs in parallel on each band (potentially at different rates), then the bands are reconstructed via synthesis filter bank. Applications include audio coding (MP3/AAC use 32-band polyphase filter banks), subband adaptive filtering, and echo cancellation.</p>
+            <p>Perfect reconstruction (PR) filter banks ensure that analysis → synthesis introduces no error (beyond processing applied to individual bands). The conditions for PR impose constraints on the analysis and synthesis filter designs.</p>
+        </div>
+
+        <div class="speculation-box">
+            <p>Classical multirate theory assumes signals are stationary within a processing block. But modern applications increasingly deal with highly non-stationary signals (speech, music, neural recordings) where the optimal sample rate might vary over time. Adaptive-rate processing — where the system dynamically adjusts its sample rate based on signal content — could dramatically reduce computation in sparse or bursty signals (only sample fast when something is happening). Event-driven ADCs already exist in neuromorphic hardware; extending the full multirate signal processing toolbox to variable-rate operation is an open mathematical challenge.</p>
+            <p class="caveat">Event-driven sampling and non-uniform multirate processing are active research areas, particularly in the neuromorphic computing and IoT communities, but lack the comprehensive theoretical framework that uniform multirate processing enjoys.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Can learned polyphase structures (where the phase filters are neural networks) outperform classical designs for specific signal classes?</li>
+                <li>What is the minimum computation required to convert between two arbitrary sample rates with a given SNR guarantee?</li>
+                <li>How should multirate systems be designed for quantum signals, where measurement collapses state?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="windowing.html">&larr; Windowing & Spectral Analysis</a>
+            <a href="applications.html" class="next">Applications &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Multirate Processing</p>
+    </footer>
+</body>
+</html>

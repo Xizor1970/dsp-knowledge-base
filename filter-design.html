@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Design Methods — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html" class="active">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Filter Design Methods</h1>
+        <p class="subtitle">From Butterworth's maximal flatness to Parks-McClellan's optimal equiripple — the algorithms that turn specifications into coefficients.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">1930</div>
+                <div class="stat-label">Butterworth Published</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">1972</div>
+                <div class="stat-label">Parks-McClellan</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">6N dB/oct</div>
+                <div class="stat-label">Butterworth Roll-off</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">Optimal</div>
+                <div class="stat-label">Equiripple FIR</div>
+            </div>
+        </div>
+
+        <h2>The Design Problem</h2>
+
+        <div class="explanation">
+            <h4>From Specification to Coefficients</h4>
+            <p>Filter design starts with a specification: "pass frequencies below 1 kHz with less than 0.5 dB ripple; reject frequencies above 1.2 kHz by at least 60 dB." The design problem is: find the minimum-order filter (fewest coefficients) that meets this spec. Different methods make different trade-offs in how they distribute the approximation error.</p>
+        </div>
+
+        <h2>IIR Design: Classical Analogue Prototypes</h2>
+
+        <div class="explanation">
+            <h4>The Analogue-to-Digital Pipeline</h4>
+            <p>Classical IIR design leverages a century of analogue filter theory. The process:</p>
+            <ol>
+                <li>Design an analogue prototype lowpass filter H<sub>a</sub>(s)</li>
+                <li>Apply frequency transformations (lowpass → highpass, bandpass, etc.)</li>
+                <li>Convert to digital via the bilinear transform: s = 2f<sub>s</sub>(z-1)/(z+1)</li>
+            </ol>
+            <p>The bilinear transform maps the entire analogue frequency axis to the digital frequency range [0, &pi;], with a slight frequency warping that must be pre-compensated.</p>
+        </div>
+
+        <h3>Butterworth: Maximum Flatness</h3>
+
+        <div class="explanation">
+            <h4>Stephen Butterworth, 1930</h4>
+            <p>The Butterworth filter has the flattest possible magnitude response in the passband — no ripple at all. It's defined by having all derivatives of |H(j&Omega;)|&sup2; equal to zero at &Omega;=0 (maximally flat). The trade-off: it requires the highest order of any classical filter type for a given transition width.</p>
+            <ul>
+                <li><strong>Passband:</strong> Maximally flat (monotonically decreasing)</li>
+                <li><strong>Stopband:</strong> Monotonically decreasing</li>
+                <li><strong>Roll-off:</strong> 20N dB/decade = 6N dB/octave (N = order)</li>
+                <li><strong>Poles:</strong> Equally spaced on a circle in the s-plane (Butterworth circle)</li>
+                <li><strong>-3 dB point:</strong> Exactly at the cutoff frequency</li>
+            </ul>
+        </div>
+
+        <div class="formula">
+            |H(j&Omega;)|&sup2; = 1 / (1 + (&Omega;/&Omega;<sub>c</sub>)<sup>2N</sup>)
+            <span class="label">Butterworth magnitude-squared response</span>
+        </div>
+
+        <div class="analogy">
+            <p>A Butterworth filter is like a perfectly maintained highway that's flat for miles, then smoothly descends a hill. No bumps, no ripples — just a gentle, predictable decline. If you need steeper descent, add more lanes (higher order), but the road always stays smooth.</p>
+        </div>
+
+        <h3>Chebyshev: Controlled Ripple for Steeper Roll-off</h3>
+
+        <div class="explanation">
+            <h4>Type I: Equiripple Passband</h4>
+            <p>The Chebyshev Type I filter allows controlled ripple in the passband (typically 0.5–3 dB) in exchange for a steeper transition than Butterworth at the same order. The ripple is "equiripple" — it oscillates between the same upper and lower bounds throughout the passband. Named after Pafnuty Chebyshev (1821–1894), whose polynomial approximation theory underlies the design.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Type II (Inverse Chebyshev): Equiripple Stopband</h4>
+            <p>The Chebyshev Type II is the mirror image: flat passband (like Butterworth) but equiripple in the stopband. Less commonly used because most applications tolerate passband ripple better than imperfect stopband rejection.</p>
+        </div>
+
+        <h3>Elliptic (Cauer): Optimal Transition Width</h3>
+
+        <div class="explanation">
+            <h4>Wilhelm Cauer, 1930s–1940s</h4>
+            <p>The elliptic filter achieves the sharpest possible transition band for any given order by allowing equiripple in BOTH passband and stopband. For a given set of specifications (passband ripple, stopband attenuation, transition width), the elliptic filter requires the lowest order — the fewest coefficients. The cost: the most non-linear phase response and the most complex design mathematics (involving elliptic functions).</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Filter Type</th>
+                    <th>Passband</th>
+                    <th>Stopband</th>
+                    <th>Transition</th>
+                    <th>Order Needed</th>
+                    <th>Phase</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Butterworth</td>
+                    <td>Maximally flat</td>
+                    <td>Monotonic</td>
+                    <td>Widest</td>
+                    <td>Highest</td>
+                    <td>Most linear</td>
+                </tr>
+                <tr>
+                    <td>Chebyshev I</td>
+                    <td>Equiripple</td>
+                    <td>Monotonic</td>
+                    <td>Medium</td>
+                    <td>Medium</td>
+                    <td>Less linear</td>
+                </tr>
+                <tr>
+                    <td>Chebyshev II</td>
+                    <td>Maximally flat</td>
+                    <td>Equiripple</td>
+                    <td>Medium</td>
+                    <td>Medium</td>
+                    <td>Less linear</td>
+                </tr>
+                <tr>
+                    <td>Elliptic</td>
+                    <td>Equiripple</td>
+                    <td>Equiripple</td>
+                    <td>Narrowest</td>
+                    <td>Lowest</td>
+                    <td>Least linear</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>The Bilinear Transform</h3>
+
+        <div class="explanation">
+            <h4>Analogue to Digital</h4>
+            <p>The bilinear transform maps the s-plane to the z-plane via:</p>
+        </div>
+
+        <div class="formula">
+            s = (2/T) &middot; (z - 1)/(z + 1) &nbsp; or equivalently &nbsp; z = (1 + sT/2)/(1 - sT/2)
+            <span class="label">Bilinear transform</span>
+        </div>
+
+        <div class="explanation">
+            <h4>Frequency Warping</h4>
+            <p>The bilinear transform compresses the infinite analogue frequency axis into [0, &pi;]. This creates a non-linear mapping: &omega;<sub>digital</sub> = 2 arctan(&Omega;<sub>analogue</sub>T/2). The remedy: pre-warp the analogue cutoff frequency before design so that the warped version lands at the correct digital frequency. For a desired digital cutoff &omega;<sub>c</sub>: &Omega;<sub>c</sub> = (2/T) tan(&omega;<sub>c</sub>/2).</p>
+        </div>
+
+        <h2>FIR Design Methods</h2>
+
+        <h3>Window Method</h3>
+
+        <div class="explanation">
+            <h4>Simple but Suboptimal</h4>
+            <p>Start with the ideal frequency response (a rectangle in frequency), compute its IDFT to get the ideal impulse response (a sinc), then truncate/window it to M+1 samples. The window shape controls the trade-off between main-lobe width (transition band) and side-lobe level (stopband rejection). Simple to implement but doesn't achieve the minimum order for a given spec.</p>
+        </div>
+
+        <h3>Parks-McClellan: Optimal Equiripple FIR</h3>
+
+        <div class="explanation">
+            <h4>Parks, McClellan & Rabiner, 1972–1973</h4>
+            <p>The Parks-McClellan algorithm (based on the Remez exchange algorithm) designs the shortest FIR filter that meets a given specification. It distributes the approximation error optimally: equiripple in both passband and stopband, with the maximum error minimised (minimax criterion). This is provably optimal — no shorter FIR filter can meet the same specs.</p>
+            <ul>
+                <li><strong>Input:</strong> Passband edge, stopband edge, passband ripple, stopband attenuation, sample rate</li>
+                <li><strong>Output:</strong> Minimum-length symmetric FIR coefficients</li>
+                <li><strong>Optimality:</strong> Achieves the theoretical minimum order for given specs</li>
+                <li><strong>Limitation:</strong> Only designs linear-phase (symmetric) FIR filters</li>
+            </ul>
+        </div>
+
+        <div class="analogy">
+            <p>Designing a filter with the window method is like cutting a tailored suit with scissors — quick but imprecise, with frayed edges. Parks-McClellan is like having a laser cutter that optimises every stitch to use the minimum fabric while meeting exact measurements. It takes more computation upfront but produces the most efficient result possible.</p>
+        </div>
+
+        <h3>Least-Squares Design</h3>
+
+        <div class="explanation">
+            <h4>Minimising Total Error</h4>
+            <p>While Parks-McClellan minimises the maximum error (peaks), least-squares design minimises the total squared error (average). This produces filters with lower average error but potentially higher peaks in some bands. Useful when you want the best overall approximation rather than guaranteed worst-case bounds. Solved via linear algebra (Toeplitz systems).</p>
+        </div>
+
+        <h2>Practical Design in Real Applications</h2>
+
+        <div class="explanation">
+            <h4>Audio: Linkwitz-Riley Crossovers</h4>
+            <p>Professional audio crossovers use Linkwitz-Riley (LR) alignment: two cascaded Butterworth filters of order N. The result is -6 dB at crossover (not -3 dB), ensuring the summed power of high and low channels is flat. LR4 (4th order, 24 dB/oct) is the industry standard for active loudspeaker management.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Communications: Root-Raised-Cosine</h4>
+            <p>Digital communications use matched root-raised-cosine (RRC) filters at transmitter and receiver. Convolved together, they produce a raised-cosine response with zero inter-symbol interference (ISI). The roll-off factor &alpha; (0 to 1) trades bandwidth for time-domain decay rate. &alpha; = 0.35 is common in LTE; &alpha; = 0.22 in DVB-S2.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Medical: Linear-Phase Requirements</h4>
+            <p>ECG processing demands linear-phase filters to preserve waveform morphology — the ST segment's shape is diagnostic, and phase distortion can mimic pathology. FIR filters with 0.05 Hz highpass (very long — thousands of taps at typical sample rates) ensure no clinically significant distortion.</p>
+        </div>
+
+        <div class="speculation-box">
+            <p>Classical filter design optimises for mathematical criteria (ripple, transition width, phase linearity). But human perception isn't linear — we're more sensitive to some distortions than others. "Perceptual filter design" could use psychoacoustic models (or learned perceptual metrics) as the optimisation criterion. A filter that's mathematically suboptimal but perceptually transparent might use fewer coefficients than one designed to minimax specs. Similarly, for machine learning inference pipelines, filters could be optimised for downstream classification accuracy rather than spectral flatness.</p>
+            <p class="caveat">Some work exists in perceptual audio coding (MP3, AAC use psychoacoustic masking) but general-purpose perceptual filter design methods remain unexplored as a formal discipline.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Can neural architecture search discover filter topologies that outperform cascaded biquads for specific applications?</li>
+                <li>Is there a unified optimisation framework that simultaneously minimises magnitude error, phase non-linearity, and computational cost?</li>
+                <li>How should filter design tools evolve for engineers who need to target heterogeneous compute (CPU + GPU + FPGA + neural accelerator)?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="filters.html">&larr; Digital Filters</a>
+            <a href="windowing.html" class="next">Windowing & Spectral Analysis &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Filter Design Methods</p>
+    </footer>
+</body>
+</html>

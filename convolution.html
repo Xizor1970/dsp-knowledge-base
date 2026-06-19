@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convolution & Correlation — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html" class="active">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Convolution & Correlation</h1>
+        <p class="subtitle">The fundamental operation of linear systems — how echoes become mathematics, and the tool that finds signals buried in noise.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">N&sup2;</div>
+                <div class="stat-label">Direct Complexity</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">N log N</div>
+                <div class="stat-label">Fast Convolution</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">L+M-1</div>
+                <div class="stat-label">Output Length</div>
+            </div>
+        </div>
+
+        <h2>Convolution: The Heart of Filtering</h2>
+
+        <div class="explanation">
+            <h4>What Convolution Does</h4>
+            <p>Convolution is the operation that computes the output of an LTI system given its input and impulse response. For an input x[n] and impulse response h[n], the output y[n] is computed by flipping h, sliding it across x, and summing the products at each position. Every sample of the output is a weighted sum of input samples, with weights given by the impulse response.</p>
+        </div>
+
+        <div class="formula">
+            y[n] = (x * h)[n] = &sum;<sub>k=-&infin;</sub><sup>&infin;</sup> x[k] &middot; h[n-k]
+            <span class="label">Linear convolution</span>
+        </div>
+
+        <div class="analogy">
+            <p>Convolution is like an echo in a cathedral. You clap once (impulse), and the building rings with a long, decaying response (impulse response). When you speak a full sentence (input signal), each syllable creates its own echo that overlaps with all the others. The total sound you hear (output) is the convolution of your speech with the cathedral's impulse response — every syllable smeared by the room's acoustics, all overlapping in time.</p>
+        </div>
+
+        <h3>The Mechanics: Flip-Shift-Multiply-Sum</h3>
+
+        <div class="explanation">
+            <h4>Step by Step</h4>
+            <p>To compute y[n] for a specific n:</p>
+            <ol>
+                <li><strong>Flip</strong> h[k] to get h[-k] (mirror it around k=0)</li>
+                <li><strong>Shift</strong> it by n to get h[n-k] (slide it to position n)</li>
+                <li><strong>Multiply</strong> x[k] &middot; h[n-k] at each k (element-wise)</li>
+                <li><strong>Sum</strong> all products (integrate the overlap)</li>
+            </ol>
+            <p>For finite-length signals (x has L samples, h has M samples), the output y has exactly L+M-1 samples. The direct computation requires L&middot;M multiplications.</p>
+        </div>
+
+        <h3>Convolution Properties</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Formula</th>
+                    <th>Significance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Commutative</td>
+                    <td>x * h = h * x</td>
+                    <td>Order doesn't matter</td>
+                </tr>
+                <tr>
+                    <td>Associative</td>
+                    <td>(x * h₁) * h₂ = x * (h₁ * h₂)</td>
+                    <td>Cascade filters = one combined filter</td>
+                </tr>
+                <tr>
+                    <td>Distributive</td>
+                    <td>x * (h₁ + h₂) = x*h₁ + x*h₂</td>
+                    <td>Parallel filters = summed responses</td>
+                </tr>
+                <tr>
+                    <td>Identity</td>
+                    <td>x * &delta; = x</td>
+                    <td>Convolving with impulse does nothing</td>
+                </tr>
+                <tr>
+                    <td>Shift</td>
+                    <td>x * &delta;[n-k] = x[n-k]</td>
+                    <td>Convolving with shifted impulse = delay</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Fast Convolution</h2>
+
+        <div class="explanation">
+            <h4>Using the FFT to Convolve</h4>
+            <p>Direct convolution of two length-N signals costs O(N&sup2;). But since convolution in time equals multiplication in frequency, we can:</p>
+            <ol>
+                <li>FFT both signals: O(N log N) each</li>
+                <li>Multiply spectra element-by-element: O(N)</li>
+                <li>IFFT the product: O(N log N)</li>
+            </ol>
+            <p>Total: O(N log N) — enormously faster for long signals. For a 1-second convolution reverb at 48 kHz (48,000 × 48,000 samples), direct takes ~2.3 billion multiplications; fast convolution takes ~500,000. That's a 4,600× speed-up.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Overlap-Save and Overlap-Add</h4>
+            <p>For real-time streaming (infinite input, finite filter), we process the input in blocks. <strong>Overlap-Save</strong> takes overlapping input blocks, applies fast convolution, and discards the corrupted boundary samples. <strong>Overlap-Add</strong> takes non-overlapping blocks, zero-pads, applies fast convolution, and sums the overlapping output tails. Both achieve block-by-block real-time operation with FFT efficiency.</p>
+        </div>
+
+        <div class="analogy">
+            <p>Fast convolution is like translating a book. Direct convolution is translating word-by-word, checking every possible meaning combination. Fast convolution is like translating each chapter into an intermediate language (FFT), doing simple word-for-word substitution in that language (multiplication), then converting back (IFFT). The intermediate language was chosen specifically to make the hard operation trivial.</p>
+        </div>
+
+        <h2>Correlation</h2>
+
+        <div class="explanation">
+            <h4>Measuring Similarity</h4>
+            <p>Correlation measures how similar two signals are as a function of a time lag applied to one of them. Unlike convolution, correlation does NOT flip one of the signals — it slides one past the other directly and sums products. It answers: "at what delay do these two signals look most alike?"</p>
+        </div>
+
+        <div class="formula">
+            r<sub>xy</sub>[l] = &sum;<sub>n=-&infin;</sub><sup>&infin;</sup> x[n] &middot; y[n-l]
+            <span class="label">Cross-correlation of x and y at lag l</span>
+        </div>
+
+        <div class="formula">
+            r<sub>xx</sub>[l] = &sum;<sub>n=-&infin;</sub><sup>&infin;</sup> x[n] &middot; x[n-l]
+            <span class="label">Autocorrelation — signal correlated with itself</span>
+        </div>
+
+        <div class="explanation">
+            <h4>Correlation vs. Convolution</h4>
+            <p>Cross-correlation of x with y is equivalent to convolving x with the time-reversed conjugate of y: r<sub>xy</sub>[l] = x[l] * y*[-l]. For real signals, correlation is convolution with one signal flipped. They're closely related operations — the same FFT trick applies for fast computation.</p>
+        </div>
+
+        <h3>Applications of Correlation</h3>
+
+        <div class="explanation">
+            <h4>Matched Filtering</h4>
+            <p>In radar and sonar, you transmit a known pulse and correlate the received signal with a copy of it. The correlation peaks at the delay corresponding to the target's range — even if the received signal is buried in noise. This "matched filter" is the optimal linear detector for a known signal in white Gaussian noise.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>GPS and CDMA</h4>
+            <p>GPS satellites each transmit a unique pseudo-random noise (PRN) code. Your receiver correlates the received signal with each satellite's known code. The correlation peak tells you the signal delay (and thus distance) to that satellite. CDMA cellular works the same way — multiple users transmit simultaneously, distinguished by their unique correlation codes.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Autocorrelation and Pitch Detection</h4>
+            <p>The autocorrelation of a periodic signal peaks at multiples of the period. This makes autocorrelation a robust pitch detector: compute r<sub>xx</sub>[l] for a speech frame, find the first major peak after l=0, and its position gives the fundamental period (and thus pitch frequency). This is how many speech coders and musical tuners work.</p>
+        </div>
+
+        <div class="analogy">
+            <p>Correlation is like sliding two transparency sheets over each other on a light table. When the patterns align perfectly, maximum light passes through (peak correlation). Autocorrelation is like sliding a transparency over a copy of itself — it peaks at zero offset (trivially) and again at every point where the pattern repeats. That's how you find periodicity.</p>
+        </div>
+
+        <h2>Circular vs. Linear Convolution</h2>
+
+        <div class="explanation">
+            <h4>The DFT Computes Circular Convolution</h4>
+            <p>Multiplying two DFTs and taking the IDFT actually gives circular (periodic) convolution, not linear. In circular convolution, signals are treated as periodic — the output "wraps around." To get linear convolution via FFT, you must zero-pad both signals to length at least L+M-1 before transforming. This prevents the wrap-around from corrupting the result.</p>
+        </div>
+
+        <div class="formula">
+            N<sub>FFT</sub> &ge; L + M - 1
+            <span class="label">Minimum FFT size for linear convolution via DFT</span>
+        </div>
+
+        <div class="speculation-box">
+            <p>Neural network layers — particularly convolutional neural networks (CNNs) — are literally built on convolution. But deep learning has shown that LEARNED filters outperform hand-designed ones in tasks like image recognition and speech enhancement. This raises a provocative question: is classical filter design theory (optimal in the minimum-error sense for known statistics) being superseded by data-driven convolution where the filter coefficients are trained rather than analytically designed? The answer likely depends on the regime: when you have good statistical models, classical theory is optimal and interpretable; when you don't, learned filters discover structure we couldn't have specified.</p>
+            <p class="caveat">The relationship between classical DSP convolution and deep learning's convolutional layers is a rich area of current study. Hybrid approaches (using DSP theory to initialise or constrain learned filters) are showing promise in resource-constrained environments.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Can we develop fast convolution algorithms that exploit the structure of specific signal classes (e.g., sparse signals) beyond what the FFT offers?</li>
+                <li>Is there an information-theoretic limit on how few multiplications are needed to convolve two arbitrary N-point sequences?</li>
+                <li>How should we teach convolution in a world where students encounter it first in deep learning rather than in circuit analysis?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="fourier.html">&larr; Fourier Transform</a>
+            <a href="z-transform.html" class="next">Z-Transform &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Convolution & Correlation</p>
+    </footer>
+</body>
+</html>

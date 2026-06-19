@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fourier Transform — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html" class="active">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>The Fourier Transform</h1>
+        <p class="subtitle">Decomposing any signal into sinusoids — the DFT, the FFT revolution, and why frequency-domain thinking unlocks everything.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">O(N log N)</div>
+                <div class="stat-label">FFT Complexity</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">1965</div>
+                <div class="stat-label">Cooley-Tukey Published</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">100&times;</div>
+                <div class="stat-label">Speed-up for N=1024</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Fourier Variants in DSP</div>
+            </div>
+        </div>
+
+        <h2>The Core Idea</h2>
+
+        <div class="explanation">
+            <h4>Every Signal is a Sum of Sinusoids</h4>
+            <p>Jean-Baptiste Joseph Fourier's insight (1822) was radical: any periodic function — no matter how jagged, complex, or irregular — can be expressed as a sum of simple sine and cosine waves at different frequencies, amplitudes, and phases. The Fourier transform extends this to non-periodic signals, decomposing them into a continuous spectrum of frequencies.</p>
+            <p>In DSP, this means we can take any sequence of numbers and ask: "what frequencies are present, and how strong is each one?" The answer is the signal's frequency-domain representation — as complete a description as the time-domain sequence itself, just viewed from a different angle.</p>
+        </div>
+
+        <div class="analogy">
+            <p>A prism splits white light into its constituent colours — red through violet, each at a different intensity. The Fourier transform is a mathematical prism for signals: it splits a complex waveform into its constituent frequencies, showing you the "colour" (frequency) and "brightness" (amplitude) of each component. Just as recombining the rainbow recreates white light, recombining the frequency components recreates the original signal.</p>
+        </div>
+
+        <h2>The Four Fourier Transforms</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Transform</th>
+                    <th>Time Domain</th>
+                    <th>Frequency Domain</th>
+                    <th>Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Fourier Series (FS)</td>
+                    <td>Continuous, periodic</td>
+                    <td>Discrete, aperiodic</td>
+                    <td>Analysing repeating waveforms</td>
+                </tr>
+                <tr>
+                    <td>Fourier Transform (FT)</td>
+                    <td>Continuous, aperiodic</td>
+                    <td>Continuous, aperiodic</td>
+                    <td>Analogue signal analysis</td>
+                </tr>
+                <tr>
+                    <td>DTFT</td>
+                    <td>Discrete, aperiodic</td>
+                    <td>Continuous, periodic</td>
+                    <td>Theoretical analysis of sequences</td>
+                </tr>
+                <tr>
+                    <td>DFT</td>
+                    <td>Discrete, periodic</td>
+                    <td>Discrete, periodic</td>
+                    <td>Computable — the one we implement</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="explanation">
+            <h4>The DFT: What Computers Actually Compute</h4>
+            <p>The Discrete Fourier Transform takes N samples in time and produces N frequency bins. It's the only member of the Fourier family that is both discrete AND finite — making it the one a computer can actually calculate. Each frequency bin X[k] tells you the amplitude and phase of a sinusoid at frequency k/N cycles per sample.</p>
+        </div>
+
+        <div class="formula">
+            X[k] = &sum;<sub>n=0</sub><sup>N-1</sup> x[n] &middot; e<sup>-j2&pi;kn/N</sup>, &nbsp; k = 0, 1, ..., N-1
+            <span class="label">DFT Analysis (forward transform)</span>
+        </div>
+
+        <div class="formula">
+            x[n] = (1/N) &sum;<sub>k=0</sub><sup>N-1</sup> X[k] &middot; e<sup>j2&pi;kn/N</sup>, &nbsp; n = 0, 1, ..., N-1
+            <span class="label">IDFT Synthesis (inverse transform)</span>
+        </div>
+
+        <h2>The FFT Revolution</h2>
+
+        <div class="explanation">
+            <h4>From Impractical to Ubiquitous</h4>
+            <p>Computing the DFT directly requires N&sup2; complex multiplications. For a 1024-point transform, that's over 1 million operations. In 1965, James Cooley (IBM) and John Tukey (Princeton) published an algorithm that exploits the symmetry and periodicity of the complex exponentials to reduce this to N log&#8322; N operations — about 10,000 for N=1024. That's a 100&times; speed-up.</p>
+            <p>This single algorithm made real-time spectrum analysis, MP3 compression, OFDM wireless, MRI imaging, and countless other technologies practically achievable. It has been called one of the most important algorithms of the 20th century.</p>
+        </div>
+
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">1,048,576</div>
+                <div class="stat-label">Direct DFT ops (N=1024)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">10,240</div>
+                <div class="stat-label">FFT ops (N=1024)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">102&times;</div>
+                <div class="stat-label">Speed-up</div>
+            </div>
+        </div>
+
+        <div class="explanation">
+            <h4>How the FFT Works (Radix-2)</h4>
+            <p>The Cooley-Tukey radix-2 algorithm divides an N-point DFT into two N/2-point DFTs: one for even-indexed samples, one for odd-indexed samples. Each half-size DFT is combined with simple "butterfly" operations (one multiplication and two additions). Applying this recursively — splitting N/2 into N/4, and so on — gives log&#8322; N stages of N/2 butterflies each: N log&#8322; N total operations.</p>
+            <p>The algorithm requires N to be a power of 2 (for radix-2). Mixed-radix variants handle arbitrary N, and the split-radix FFT further reduces operations by ~17% through combining radix-2 and radix-4 stages.</p>
+        </div>
+
+        <div class="analogy">
+            <p>Computing the DFT directly is like asking 1,024 people to each shake hands with all 1,024 others — about half a million handshakes. The FFT is like organising them into a tournament bracket: each round, you pair people (butterfly operations) and pass results up. With 10 rounds of 512 pairings each, you get all the same information with only 5,120 interactions. Same result, fraction of the work.</p>
+        </div>
+
+        <h2>Interpreting the DFT</h2>
+
+        <div class="explanation">
+            <h4>Frequency Bins</h4>
+            <p>For an N-point DFT at sample rate f<sub>s</sub>:</p>
+            <ul>
+                <li><strong>Bin 0</strong> (DC): The average value of the signal — the "zero frequency" component</li>
+                <li><strong>Bin k</strong>: Frequency f = k &middot; f<sub>s</sub>/N Hz. Resolution is f<sub>s</sub>/N Hz per bin.</li>
+                <li><strong>Bin N/2</strong> (Nyquist): The highest representable frequency, f<sub>s</sub>/2</li>
+                <li><strong>Bins N/2+1 to N-1</strong>: Negative frequencies (mirror of bins 1 to N/2-1 for real signals)</li>
+            </ul>
+            <p>For a real-valued signal, the spectrum is conjugate-symmetric: |X[k]| = |X[N-k]|. Only the first N/2+1 bins carry unique information.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Magnitude and Phase</h4>
+            <p>Each DFT bin X[k] is complex. The magnitude |X[k]| tells you the amplitude of frequency k. The phase &angle;X[k] tells you how that sinusoid is shifted in time. In many applications (audio analysis, vibration monitoring), we care primarily about the magnitude spectrum. But in others (communications, image processing), phase carries critical information.</p>
+        </div>
+
+        <div class="formula">
+            |X[k]| = &radic;(Re{X[k]}&sup2; + Im{X[k]}&sup2;)
+            <span class="label">Magnitude spectrum</span>
+        </div>
+
+        <div class="formula">
+            &angle;X[k] = arctan(Im{X[k]} / Re{X[k]})
+            <span class="label">Phase spectrum</span>
+        </div>
+
+        <h2>Key Properties</h2>
+
+        <div class="explanation">
+            <h4>The Duality That Makes DSP Work</h4>
+            <p>The most powerful DFT property: <strong>convolution in time equals multiplication in frequency</strong>. Filtering a signal (convolving with h[n]) can be done by multiplying spectra: Y[k] = X[k] &middot; H[k]. For long signals, it's actually faster to FFT both signals, multiply bin-by-bin, and IFFT the result than to convolve directly. This "fast convolution" or "overlap-save" method is how most real-time audio effects work.</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Time Domain</th>
+                    <th>Frequency Domain</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Linearity</td>
+                    <td>ax₁[n] + bx₂[n]</td>
+                    <td>aX₁[k] + bX₂[k]</td>
+                </tr>
+                <tr>
+                    <td>Time Shift</td>
+                    <td>x[n - m]</td>
+                    <td>X[k] &middot; e<sup>-j2&pi;km/N</sup></td>
+                </tr>
+                <tr>
+                    <td>Convolution</td>
+                    <td>x₁[n] ⊛ x₂[n]</td>
+                    <td>X₁[k] &middot; X₂[k]</td>
+                </tr>
+                <tr>
+                    <td>Multiplication</td>
+                    <td>x₁[n] &middot; x₂[n]</td>
+                    <td>X₁[k] ⊛ X₂[k] / N</td>
+                </tr>
+                <tr>
+                    <td>Parseval's</td>
+                    <td>&sum;|x[n]|&sup2;</td>
+                    <td>(1/N)&sum;|X[k]|&sup2;</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Practical Considerations</h2>
+
+        <div class="explanation">
+            <h4>Zero-Padding</h4>
+            <p>Appending zeros to a signal before computing the DFT doesn't add information, but it does increase the number of frequency bins — interpolating the spectrum for a smoother-looking magnitude plot. Zero-padding from N to 2N doubles frequency resolution visually (though the true resolution is still determined by the original N samples).</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Spectral Leakage</h4>
+            <p>The DFT assumes the input is one period of a periodic signal. If the actual signal's frequency doesn't land exactly on a bin centre, energy "leaks" into neighbouring bins, creating a smeared spectrum. Windowing (covered in the Windowing chapter) is the primary tool for controlling leakage.</p>
+        </div>
+
+        <div class="speculation-box">
+            <p>The FFT's O(N log N) complexity has stood since 1965. Is there a fundamentally faster algorithm? In 2012, researchers at MIT demonstrated the Sparse Fourier Transform (sFFT), achieving O(k log N) complexity for signals with only k significant frequency components (k ≪ N). For many real-world signals — which ARE sparse in frequency — this represents another orders-of-magnitude leap. Could sFFT do for sparse signals what the FFT did for all signals?</p>
+            <p class="caveat">The sFFT is proven but practical implementations are still maturing. It requires knowledge of (or assumptions about) signal sparsity, limiting its generality compared to the FFT. Current hardware FFT implementations are also extremely optimised, making the crossover point higher than theory suggests.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Is O(N log N) the fundamental lower bound for computing the DFT of a general signal, or could a sub-N-log-N algorithm exist?</li>
+                <li>How will quantum computing affect Fourier analysis — can the Quantum Fourier Transform's exponential speedup translate to classical signal processing tasks?</li>
+                <li>As signals grow to billions of samples (genomics, astronomy), what architectural changes are needed to make FFTs memory-efficient on modern cache hierarchies?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="sampling.html">&larr; Sampling & Aliasing</a>
+            <a href="convolution.html" class="next">Convolution & Correlation &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Fourier Transform</p>
+    </footer>
+</body>
+</html>

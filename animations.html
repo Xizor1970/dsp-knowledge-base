@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Animations — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html" class="active">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Interactive Animations</h1>
+        <p class="subtitle">Manipulate parameters, see DSP concepts unfold in real time. No installation required — just your browser.</p>
+    </div>
+
+    <div class="content">
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- ANIMATION 1: Sampling & Aliasing -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+
+        <h2>1. Sampling & Aliasing</h2>
+
+        <div class="animation-container">
+            <h3>See Aliasing Happen</h3>
+            <canvas id="sampling-canvas" width="1000" height="350"></canvas>
+            <div class="animation-controls">
+                <label>Signal Frequency: <span id="sig-freq-val">3.0</span> Hz
+                    <input type="range" id="sig-freq" min="0.5" max="12" step="0.1" value="3">
+                </label>
+                <label>Sample Rate: <span id="sample-rate-val">8.0</span> Hz
+                    <input type="range" id="sample-rate" min="2" max="20" step="0.5" value="8">
+                </label>
+                <button id="sampling-reset">Reset</button>
+            </div>
+            <div class="animation-explainer">
+                <div class="col">
+                    <h4>What you're seeing</h4>
+                    <p>The blue curve is the original continuous signal. Red dots are samples taken at the chosen rate. The dashed green curve shows what frequency is reconstructed from those samples. When sample rate < 2× signal frequency, the green curve shows a DIFFERENT frequency — that's aliasing.</p>
+                </div>
+                <div class="col">
+                    <h4>So what?</h4>
+                    <p>This demonstrates the Nyquist theorem viscerally. Push the signal frequency above half the sample rate and watch the reconstructed signal become something entirely different. This is irreversible — once aliased, the original frequency is unrecoverable. Every ADC in existence must prevent this.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- ANIMATION 2: Fourier Synthesis -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+
+        <h2>2. Fourier Synthesis</h2>
+
+        <div class="animation-container">
+            <h3>Building Waves from Sinusoids</h3>
+            <canvas id="fourier-canvas" width="1000" height="400"></canvas>
+            <div class="animation-controls">
+                <label>Harmonics: <span id="harmonics-val">5</span>
+                    <input type="range" id="harmonics" min="1" max="30" step="1" value="5">
+                </label>
+                <label>Waveform:
+                    <button id="wave-square" class="active">Square</button>
+                    <button id="wave-saw">Sawtooth</button>
+                    <button id="wave-triangle">Triangle</button>
+                </label>
+            </div>
+            <div class="animation-explainer">
+                <div class="col">
+                    <h4>What you're seeing</h4>
+                    <p>Individual sinusoidal harmonics (grey) sum to produce the target waveform (gold). Add more harmonics to see the approximation improve. The Gibbs phenomenon (overshoot at discontinuities) never disappears — it's a fundamental property of Fourier convergence at jumps.</p>
+                </div>
+                <div class="col">
+                    <h4>So what?</h4>
+                    <p>This is the core insight of Fourier analysis: ANY signal is a sum of sinusoids. A square wave needs infinite harmonics to be perfect; with 30, it's already very close. This is why bandwidth-limited signals (finite harmonics) are always smooth — they literally cannot have sharp edges.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- ANIMATION 3: Convolution -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+
+        <h2>3. Convolution Visualised</h2>
+
+        <div class="animation-container">
+            <h3>Flip, Shift, Multiply, Sum</h3>
+            <canvas id="conv-canvas" width="1000" height="400"></canvas>
+            <div class="animation-controls">
+                <label>Position: <span id="conv-pos-val">0</span>
+                    <input type="range" id="conv-pos" min="-20" max="40" step="1" value="0">
+                </label>
+                <button id="conv-animate">Animate</button>
+                <button id="conv-reset">Reset</button>
+            </div>
+            <div class="animation-explainer">
+                <div class="col">
+                    <h4>What you're seeing</h4>
+                    <p>Top: input signal x[n] (blue) and flipped/shifted impulse response h[n-k] (red). Middle: element-wise product (green area = output value at current position). Bottom: output y[n] building up as the kernel slides across.</p>
+                </div>
+                <div class="col">
+                    <h4>So what?</h4>
+                    <p>Convolution is the ONLY operation needed to compute any LTI system's output. Every filter, every reverb, every blur is this operation. Understanding the flip-shift-multiply-sum mechanics makes filter behaviour intuitive — you can SEE why a wider kernel means more smoothing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- ANIMATION 4: Pole-Zero Plot & Frequency Response -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+
+        <h2>4. Poles, Zeros & Frequency Response</h2>
+
+        <div class="animation-container">
+            <h3>Drag Poles and Zeros</h3>
+            <canvas id="pz-canvas" width="1000" height="400"></canvas>
+            <div class="animation-controls">
+                <button id="pz-add-pole">Add Pole</button>
+                <button id="pz-add-zero">Add Zero</button>
+                <button id="pz-clear">Clear All</button>
+                <label style="font-size: 0.8rem; color: var(--text-muted);">Click canvas to place. Drag to move.</label>
+            </div>
+            <div class="animation-explainer">
+                <div class="col">
+                    <h4>What you're seeing</h4>
+                    <p>Left: the z-plane with unit circle. Poles (×) create peaks in the frequency response; zeros (○) create nulls. Right: the resulting magnitude frequency response, computed from the pole-zero positions. Drag them and watch the response reshape in real time.</p>
+                </div>
+                <div class="col">
+                    <h4>So what?</h4>
+                    <p>This builds intuition for filter design. A pole near the unit circle at angle &theta; creates a resonance at frequency &theta;. A zero on the circle kills that frequency completely. Moving a pole outward (toward |z|=1) sharpens the peak; pulling it inward broadens it. This is how parametric equalisers work.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- ANIMATION 5: Window Functions -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+
+        <h2>5. Window Functions & Spectral Leakage</h2>
+
+        <div class="animation-container">
+            <h3>See How Windows Shape the Spectrum</h3>
+            <canvas id="window-canvas" width="1000" height="350"></canvas>
+            <div class="animation-controls">
+                <label>Window:
+                    <button id="win-rect" class="active">Rectangular</button>
+                    <button id="win-hann">Hann</button>
+                    <button id="win-hamming">Hamming</button>
+                    <button id="win-blackman">Blackman</button>
+                </label>
+                <label>Signal Freq (bins): <span id="win-freq-val">5.0</span>
+                    <input type="range" id="win-freq" min="1" max="15" step="0.1" value="5">
+                </label>
+            </div>
+            <div class="animation-explainer">
+                <div class="col">
+                    <h4>What you're seeing</h4>
+                    <p>Top: the windowed signal in time (window shape × sinusoid). Bottom: its magnitude spectrum (DFT). When the signal frequency lands exactly on a bin, the spectrum is clean. Move it between bins and watch leakage spread energy to neighbours. Different windows trade main-lobe width for side-lobe suppression.</p>
+                </div>
+                <div class="col">
+                    <h4>So what?</h4>
+                    <p>This is why window choice matters for spectral analysis. The rectangular window gives best resolution but worst leakage (-13 dB side lobes). Blackman kills leakage (-58 dB) but widens the main lobe. There's no free lunch — you choose based on whether resolution or dynamic range matters more for your application.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-nav">
+            <a href="applications.html">&larr; Applications</a>
+            <a href="index.html" class="next">Home &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Interactive Animations</p>
+    </footer>
+
+    <script>
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION 1: Sampling & Aliasing
+    // ═══════════════════════════════════════════════════════════════
+    (function() {
+        const canvas = document.getElementById('sampling-canvas');
+        const ctx = canvas.getContext('2d');
+        const sigFreqSlider = document.getElementById('sig-freq');
+        const sampleRateSlider = document.getElementById('sample-rate');
+        const sigFreqVal = document.getElementById('sig-freq-val');
+        const sampleRateVal = document.getElementById('sample-rate-val');
+
+        function draw() {
+            const W = canvas.width, H = canvas.height;
+            const sigFreq = parseFloat(sigFreqSlider.value);
+            const sampleRate = parseFloat(sampleRateSlider.value);
+            sigFreqVal.textContent = sigFreq.toFixed(1);
+            sampleRateVal.textContent = sampleRate.toFixed(1);
+
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#0d0d14';
+            ctx.fillRect(0, 0, W, H);
+
+            const margin = 40;
+            const plotW = W - 2 * margin;
+            const plotH = H - 2 * margin;
+            const midY = margin + plotH / 2;
+            const duration = 2;
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(margin, midY);
+            ctx.lineTo(W - margin, midY);
+            ctx.stroke();
+
+            // Original signal (continuous)
+            ctx.strokeStyle = '#6a82fb';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let px = 0; px <= plotW; px++) {
+                const t = (px / plotW) * duration;
+                const y = Math.sin(2 * Math.PI * sigFreq * t);
+                const cy = midY - y * (plotH * 0.4);
+                if (px === 0) ctx.moveTo(margin + px, cy);
+                else ctx.lineTo(margin + px, cy);
+            }
+            ctx.stroke();
+
+            // Sample points
+            const numSamples = Math.floor(duration * sampleRate);
+            const samples = [];
+            ctx.fillStyle = '#fc5c7d';
+            for (let i = 0; i <= numSamples; i++) {
+                const t = i / sampleRate;
+                const px = (t / duration) * plotW + margin;
+                const y = Math.sin(2 * Math.PI * sigFreq * t);
+                const cy = midY - y * (plotH * 0.4);
+                samples.push({ t, y, px, cy });
+                ctx.beginPath();
+                ctx.arc(px, cy, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Reconstructed (aliased) signal
+            const nyquist = sampleRate / 2;
+            let aliasFreq = sigFreq;
+            if (sigFreq > nyquist) {
+                aliasFreq = sampleRate - sigFreq;
+                if (aliasFreq < 0) aliasFreq = Math.abs(aliasFreq);
+                while (aliasFreq > nyquist) aliasFreq = sampleRate - aliasFreq;
+                aliasFreq = Math.abs(aliasFreq);
+            }
+
+            ctx.strokeStyle = '#5a9';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            for (let px = 0; px <= plotW; px++) {
+                const t = (px / plotW) * duration;
+                const y = Math.sin(2 * Math.PI * aliasFreq * t);
+                const cy = midY - y * (plotH * 0.4);
+                if (px === 0) ctx.moveTo(margin + px, cy);
+                else ctx.lineTo(margin + px, cy);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Labels
+            ctx.font = '13px Inter, sans-serif';
+            ctx.fillStyle = '#6a82fb';
+            ctx.fillText('Original: ' + sigFreq.toFixed(1) + ' Hz', margin + 10, margin + 15);
+            ctx.fillStyle = '#5a9';
+            ctx.fillText('Reconstructed: ' + aliasFreq.toFixed(1) + ' Hz', margin + 10, margin + 33);
+            ctx.fillStyle = '#fc5c7d';
+            ctx.fillText('Nyquist: ' + nyquist.toFixed(1) + ' Hz', margin + 10, margin + 51);
+
+            if (sigFreq > nyquist) {
+                ctx.fillStyle = '#fc5c7d';
+                ctx.font = 'bold 14px Inter, sans-serif';
+                ctx.fillText('⚠ ALIASING — signal frequency exceeds Nyquist limit', W/2 - 180, H - 15);
+            } else {
+                ctx.fillStyle = '#5a9';
+                ctx.font = '13px Inter, sans-serif';
+                ctx.fillText('✓ No aliasing — signal properly sampled', W/2 - 120, H - 15);
+            }
+        }
+
+        sigFreqSlider.addEventListener('input', draw);
+        sampleRateSlider.addEventListener('input', draw);
+        document.getElementById('sampling-reset').addEventListener('click', () => {
+            sigFreqSlider.value = 3;
+            sampleRateSlider.value = 8;
+            draw();
+        });
+        draw();
+    })();
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION 2: Fourier Synthesis
+    // ═══════════════════════════════════════════════════════════════
+    (function() {
+        const canvas = document.getElementById('fourier-canvas');
+        const ctx = canvas.getContext('2d');
+        const harmonicsSlider = document.getElementById('harmonics');
+        const harmonicsVal = document.getElementById('harmonics-val');
+        let waveType = 'square';
+
+        function getHarmonic(type, k) {
+            switch (type) {
+                case 'square':
+                    if (k % 2 === 0) return 0;
+                    return (4 / (Math.PI * k));
+                case 'saw':
+                    return (2 / (Math.PI * k)) * Math.pow(-1, k + 1);
+                case 'triangle':
+                    if (k % 2 === 0) return 0;
+                    return (8 / (Math.PI * Math.PI * k * k)) * Math.pow(-1, (k - 1) / 2);
+                default:
+                    return 0;
+            }
+        }
+
+        function draw() {
+            const W = canvas.width, H = canvas.height;
+            const numH = parseInt(harmonicsSlider.value);
+            harmonicsVal.textContent = numH;
+
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#0d0d14';
+            ctx.fillRect(0, 0, W, H);
+
+            const margin = 40;
+            const plotW = W - 2 * margin;
+            const plotH = H - 2 * margin;
+            const midY = margin + plotH / 2;
+            const cycles = 2;
+            const points = 500;
+
+            // Axis
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(margin, midY);
+            ctx.lineTo(W - margin, midY);
+            ctx.stroke();
+
+            // Draw individual harmonics (faint)
+            for (let k = 1; k <= numH; k++) {
+                const amp = getHarmonic(waveType, k);
+                if (Math.abs(amp) < 0.001) continue;
+                ctx.strokeStyle = 'rgba(136, 136, 153, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let i = 0; i <= points; i++) {
+                    const t = (i / points) * cycles * 2 * Math.PI;
+                    const y = amp * Math.sin(k * t);
+                    const px = margin + (i / points) * plotW;
+                    const py = midY - y * (plotH * 0.4);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+            }
+
+            // Draw sum (gold)
+            ctx.strokeStyle = '#f0c27f';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let i = 0; i <= points; i++) {
+                const t = (i / points) * cycles * 2 * Math.PI;
+                let y = 0;
+                for (let k = 1; k <= numH; k++) {
+                    y += getHarmonic(waveType, k) * Math.sin(k * t);
+                }
+                const px = margin + (i / points) * plotW;
+                const py = midY - y * (plotH * 0.4);
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Label
+            ctx.font = '13px Inter, sans-serif';
+            ctx.fillStyle = '#f0c27f';
+            ctx.fillText(waveType.charAt(0).toUpperCase() + waveType.slice(1) + ' wave — ' + numH + ' harmonics', margin + 10, margin + 15);
+        }
+
+        harmonicsSlider.addEventListener('input', draw);
+
+        document.getElementById('wave-square').addEventListener('click', function() {
+            waveType = 'square';
+            document.querySelectorAll('.animation-controls button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            draw();
+        });
+        document.getElementById('wave-saw').addEventListener('click', function() {
+            waveType = 'saw';
+            document.querySelectorAll('.animation-controls button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            draw();
+        });
+        document.getElementById('wave-triangle').addEventListener('click', function() {
+            waveType = 'triangle';
+            document.querySelectorAll('.animation-controls button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            draw();
+        });
+
+        draw();
+    })();
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION 3: Convolution
+    // ═══════════════════════════════════════════════════════════════
+    (function() {
+        const canvas = document.getElementById('conv-canvas');
+        const ctx = canvas.getContext('2d');
+        const posSlider = document.getElementById('conv-pos');
+        const posVal = document.getElementById('conv-pos-val');
+        let animating = false;
+        let animId = null;
+
+        // Signal: pulse
+        const x = new Array(30).fill(0);
+        for (let i = 5; i < 15; i++) x[i] = 1;
+        for (let i = 15; i < 20; i++) x[i] = 0.5;
+
+        // Kernel: triangle
+        const h = [0.1, 0.2, 0.4, 0.6, 0.8, 1.0, 0.8, 0.6, 0.4, 0.2, 0.1];
+        const hLen = h.length;
+
+        // Full convolution result
+        const yFull = new Array(x.length + hLen - 1).fill(0);
+        for (let n = 0; n < yFull.length; n++) {
+            for (let k = 0; k < hLen; k++) {
+                if (n - k >= 0 && n - k < x.length) {
+                    yFull[n] += x[n - k] * h[k];
+                }
+            }
+        }
+        const yMax = Math.max(...yFull);
+
+        function draw() {
+            const W = canvas.width, H = canvas.height;
+            const pos = parseInt(posSlider.value);
+            posVal.textContent = pos;
+
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#0d0d14';
+            ctx.fillRect(0, 0, W, H);
+
+            const margin = 30;
+            const plotW = W - 2 * margin;
+            const rowH = H / 3;
+            const totalLen = x.length + hLen - 1;
+            const barW = plotW / totalLen;
+
+            // Row 1: x[n] and h[pos-k]
+            const r1Mid = rowH / 2;
+            ctx.fillStyle = 'rgba(106,130,251,0.6)';
+            for (let i = 0; i < x.length; i++) {
+                const bx = margin + i * barW;
+                const bh = x[i] * (rowH * 0.4);
+                ctx.fillRect(bx, r1Mid - bh, barW - 1, bh);
+            }
+
+            // Flipped shifted kernel
+            ctx.fillStyle = 'rgba(252,92,125,0.6)';
+            for (let k = 0; k < hLen; k++) {
+                const idx = pos - k;
+                if (idx >= 0 && idx < totalLen) {
+                    const bx = margin + idx * barW;
+                    const bh = h[k] * (rowH * 0.4);
+                    ctx.fillRect(bx, r1Mid, barW - 1, bh);
+                }
+            }
+
+            // Row 2: product
+            const r2Top = rowH;
+            const r2Mid = r2Top + rowH / 2;
+            ctx.fillStyle = 'rgba(85,170,153,0.6)';
+            let currentSum = 0;
+            for (let k = 0; k < hLen; k++) {
+                const idx = pos - k;
+                if (idx >= 0 && idx < x.length) {
+                    const product = x[idx] * h[k];
+                    currentSum += product;
+                    const bx = margin + idx * barW;
+                    const bh = product * (rowH * 0.4);
+                    ctx.fillRect(bx, r2Mid - bh, barW - 1, bh);
+                }
+            }
+
+            // Row 3: output
+            const r3Top = 2 * rowH;
+            const r3Mid = r3Top + rowH / 2;
+            ctx.fillStyle = 'rgba(240,194,127,0.4)';
+            for (let i = 0; i <= pos && i < yFull.length; i++) {
+                const bx = margin + i * barW;
+                const bh = (yFull[i] / yMax) * (rowH * 0.4);
+                ctx.fillRect(bx, r3Mid - bh, barW - 1, bh);
+            }
+            // Highlight current
+            if (pos >= 0 && pos < yFull.length) {
+                ctx.fillStyle = '#f0c27f';
+                const bx = margin + pos * barW;
+                const bh = (yFull[pos] / yMax) * (rowH * 0.4);
+                ctx.fillRect(bx, r3Mid - bh, barW - 1, bh);
+            }
+
+            // Labels
+            ctx.font = '12px Inter, sans-serif';
+            ctx.fillStyle = '#6a82fb';
+            ctx.fillText('x[n] (input)', margin, 15);
+            ctx.fillStyle = '#fc5c7d';
+            ctx.fillText('h[' + pos + '-k] (kernel)', margin + 120, 15);
+            ctx.fillStyle = '#5a9';
+            ctx.fillText('Product (sum = ' + currentSum.toFixed(2) + ')', margin, r2Top + 15);
+            ctx.fillStyle = '#f0c27f';
+            ctx.fillText('y[n] (output)', margin, r3Top + 15);
+
+            // Row separators
+            ctx.strokeStyle = '#222';
+            ctx.beginPath();
+            ctx.moveTo(margin, rowH);
+            ctx.lineTo(W - margin, rowH);
+            ctx.moveTo(margin, 2 * rowH);
+            ctx.lineTo(W - margin, 2 * rowH);
+            ctx.stroke();
+        }
+
+        posSlider.addEventListener('input', draw);
+
+        document.getElementById('conv-animate').addEventListener('click', function() {
+            if (animating) {
+                animating = false;
+                cancelAnimationFrame(animId);
+                this.textContent = 'Animate';
+                return;
+            }
+            animating = true;
+            this.textContent = 'Stop';
+            posSlider.value = -20;
+            let lastTime = 0;
+            function step(time) {
+                if (!animating) return;
+                if (time - lastTime > 100) {
+                    lastTime = time;
+                    let v = parseInt(posSlider.value) + 1;
+                    if (v > 40) { animating = false; document.getElementById('conv-animate').textContent = 'Animate'; return; }
+                    posSlider.value = v;
+                    draw();
+                }
+                animId = requestAnimationFrame(step);
+            }
+            animId = requestAnimationFrame(step);
+        });
+
+        document.getElementById('conv-reset').addEventListener('click', () => {
+            animating = false;
+            posSlider.value = 0;
+            draw();
+        });
+
+        draw();
+    })();
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION 4: Pole-Zero Plot
+    // ═══════════════════════════════════════════════════════════════
+    (function() {
+        const canvas = document.getElementById('pz-canvas');
+        const ctx = canvas.getContext('2d');
+        let poles = [{x: 0.7, y: 0.5}, {x: 0.7, y: -0.5}];
+        let zeros = [{x: -0.8, y: 0.3}, {x: -0.8, y: -0.3}];
+        let mode = 'pole';
+        let dragging = null;
+        let dragType = null;
+
+        function draw() {
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#0d0d14';
+            ctx.fillRect(0, 0, W, H);
+
+            // Z-plane (left half)
+            const zCx = W * 0.25, zCy = H / 2, zR = H * 0.38;
+
+            // Unit circle
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(zCx, zCy, zR, 0, 2 * Math.PI);
+            ctx.stroke();
+
+            // Axes
+            ctx.beginPath();
+            ctx.moveTo(zCx - zR - 20, zCy);
+            ctx.lineTo(zCx + zR + 20, zCy);
+            ctx.moveTo(zCx, zCy - zR - 20);
+            ctx.lineTo(zCx, zCy + zR + 20);
+            ctx.stroke();
+
+            // Draw zeros
+            ctx.strokeStyle = '#6a82fb';
+            ctx.lineWidth = 2;
+            zeros.forEach(z => {
+                const px = zCx + z.x * zR;
+                const py = zCy - z.y * zR;
+                ctx.beginPath();
+                ctx.arc(px, py, 8, 0, 2 * Math.PI);
+                ctx.stroke();
+            });
+
+            // Draw poles
+            ctx.strokeStyle = '#fc5c7d';
+            ctx.lineWidth = 2;
+            poles.forEach(p => {
+                const px = zCx + p.x * zR;
+                const py = zCy - p.y * zR;
+                ctx.beginPath();
+                ctx.moveTo(px - 7, py - 7);
+                ctx.lineTo(px + 7, py + 7);
+                ctx.moveTo(px + 7, py - 7);
+                ctx.lineTo(px - 7, py + 7);
+                ctx.stroke();
+            });
+
+            // Frequency response (right half)
+            const frLeft = W * 0.55, frRight = W - 30;
+            const frTop = 40, frBottom = H - 40;
+            const frW = frRight - frLeft;
+            const frH = frBottom - frTop;
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(frLeft, frBottom);
+            ctx.lineTo(frRight, frBottom);
+            ctx.moveTo(frLeft, frTop);
+            ctx.lineTo(frLeft, frBottom);
+            ctx.stroke();
+
+            // Compute frequency response
+            const numPoints = 200;
+            const magnitudes = [];
+            for (let i = 0; i < numPoints; i++) {
+                const w = (i / (numPoints - 1)) * Math.PI;
+                const cosw = Math.cos(w), sinw = Math.sin(w);
+
+                let numMag = 1, denMag = 1;
+                zeros.forEach(z => {
+                    const dx = cosw - z.x, dy = sinw - z.y;
+                    numMag *= Math.sqrt(dx * dx + dy * dy);
+                });
+                poles.forEach(p => {
+                    const dx = cosw - p.x, dy = sinw - p.y;
+                    denMag *= Math.sqrt(dx * dx + dy * dy);
+                });
+                magnitudes.push(denMag < 0.001 ? 60 : 20 * Math.log10(numMag / denMag));
+            }
+
+            const magMax = Math.max(...magnitudes);
+            const magMin = Math.min(...magnitudes.filter(m => m > -60));
+            const range = Math.max(magMax - magMin, 1);
+
+            ctx.strokeStyle = '#f0c27f';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < numPoints; i++) {
+                const px = frLeft + (i / (numPoints - 1)) * frW;
+                const norm = (magnitudes[i] - magMin) / range;
+                const py = frBottom - Math.max(0, Math.min(1, norm)) * frH;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Labels
+            ctx.font = '12px Inter, sans-serif';
+            ctx.fillStyle = '#889';
+            ctx.fillText('Re', zCx + zR + 5, zCy - 5);
+            ctx.fillText('Im', zCx + 5, zCy - zR - 5);
+            ctx.fillText('0', frLeft - 5, frBottom + 15);
+            ctx.fillText('π', frRight - 5, frBottom + 15);
+            ctx.fillText('Frequency →', frLeft + frW / 2 - 30, frBottom + 15);
+            ctx.fillStyle = '#f0c27f';
+            ctx.fillText('Magnitude (dB)', frLeft + 5, frTop - 5);
+
+            // Stability indicator
+            const unstable = poles.some(p => Math.sqrt(p.x * p.x + p.y * p.y) >= 1);
+            ctx.font = 'bold 12px Inter, sans-serif';
+            if (unstable) {
+                ctx.fillStyle = '#fc5c7d';
+                ctx.fillText('⚠ UNSTABLE — pole outside unit circle', zCx - 80, H - 10);
+            } else {
+                ctx.fillStyle = '#5a9';
+                ctx.fillText('✓ Stable — all poles inside unit circle', zCx - 80, H - 10);
+            }
+        }
+
+        document.getElementById('pz-add-pole').addEventListener('click', () => { mode = 'pole'; });
+        document.getElementById('pz-add-zero').addEventListener('click', () => { mode = 'zero'; });
+        document.getElementById('pz-clear').addEventListener('click', () => {
+            poles = [];
+            zeros = [];
+            draw();
+        });
+
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            const zCx = canvas.width * 0.25, zCy = canvas.height / 2, zR = canvas.height * 0.38;
+
+            // Check if clicking on existing pole/zero
+            for (let i = 0; i < poles.length; i++) {
+                const px = zCx + poles[i].x * zR, py = zCy - poles[i].y * zR;
+                if (Math.hypot(mx - px, my - py) < 12) {
+                    dragging = poles[i]; dragType = 'pole'; return;
+                }
+            }
+            for (let i = 0; i < zeros.length; i++) {
+                const px = zCx + zeros[i].x * zR, py = zCy - zeros[i].y * zR;
+                if (Math.hypot(mx - px, my - py) < 12) {
+                    dragging = zeros[i]; dragType = 'zero'; return;
+                }
+            }
+
+            // New pole/zero in z-plane area
+            if (mx < canvas.width * 0.5) {
+                const zx = (mx - zCx) / zR;
+                const zy = -(my - zCy) / zR;
+                if (mode === 'pole') poles.push({x: zx, y: zy});
+                else zeros.push({x: zx, y: zy});
+                draw();
+            }
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (!dragging) return;
+            const rect = canvas.getBoundingClientRect();
+            const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+            const zCx = canvas.width * 0.25, zCy = canvas.height / 2, zR = canvas.height * 0.38;
+            dragging.x = (mx - zCx) / zR;
+            dragging.y = -(my - zCy) / zR;
+            draw();
+        });
+
+        canvas.addEventListener('mouseup', () => { dragging = null; });
+        canvas.addEventListener('mouseleave', () => { dragging = null; });
+
+        draw();
+    })();
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANIMATION 5: Window Functions
+    // ═══════════════════════════════════════════════════════════════
+    (function() {
+        const canvas = document.getElementById('window-canvas');
+        const ctx = canvas.getContext('2d');
+        const freqSlider = document.getElementById('win-freq');
+        const freqVal = document.getElementById('win-freq-val');
+        let windowType = 'rect';
+        const N = 64;
+
+        function getWindow(type, n, N) {
+            switch (type) {
+                case 'rect': return 1;
+                case 'hann': return 0.5 * (1 - Math.cos(2 * Math.PI * n / (N - 1)));
+                case 'hamming': return 0.54 - 0.46 * Math.cos(2 * Math.PI * n / (N - 1));
+                case 'blackman': return 0.42 - 0.5 * Math.cos(2 * Math.PI * n / (N - 1)) + 0.08 * Math.cos(4 * Math.PI * n / (N - 1));
+                default: return 1;
+            }
+        }
+
+        function draw() {
+            const W = canvas.width, H = canvas.height;
+            const freq = parseFloat(freqSlider.value);
+            freqVal.textContent = freq.toFixed(1);
+
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#0d0d14';
+            ctx.fillRect(0, 0, W, H);
+
+            const margin = 40;
+            const plotW = W - 2 * margin;
+            const topH = H * 0.4;
+            const botTop = H * 0.5;
+            const botH = H * 0.45;
+
+            // Generate windowed signal
+            const signal = [];
+            for (let n = 0; n < N; n++) {
+                const w = getWindow(windowType, n, N);
+                const s = Math.sin(2 * Math.PI * freq * n / N);
+                signal.push(w * s);
+            }
+
+            // Top plot: windowed signal
+            ctx.strokeStyle = '#f0c27f';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let n = 0; n < N; n++) {
+                const px = margin + (n / (N - 1)) * plotW;
+                const py = margin + topH / 2 - signal[n] * (topH * 0.4);
+                if (n === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Window shape (faint)
+            ctx.strokeStyle = 'rgba(136,136,153,0.5)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath();
+            for (let n = 0; n < N; n++) {
+                const w = getWindow(windowType, n, N);
+                const px = margin + (n / (N - 1)) * plotW;
+                const py = margin + topH / 2 - w * (topH * 0.4);
+                if (n === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Compute DFT magnitude (zero-padded to 512)
+            const NFFT = 512;
+            const padded = new Array(NFFT).fill(0);
+            for (let n = 0; n < N; n++) padded[n] = signal[n];
+
+            const mag = new Array(NFFT / 2).fill(0);
+            for (let k = 0; k < NFFT / 2; k++) {
+                let re = 0, im = 0;
+                for (let n = 0; n < NFFT; n++) {
+                    const angle = 2 * Math.PI * k * n / NFFT;
+                    re += padded[n] * Math.cos(angle);
+                    im -= padded[n] * Math.sin(angle);
+                }
+                mag[k] = Math.sqrt(re * re + im * im);
+            }
+            const magMax = Math.max(...mag);
+            const magDb = mag.map(m => m > 0 ? 20 * Math.log10(m / magMax) : -100);
+
+            // Bottom plot: magnitude spectrum (dB)
+            const dbMin = -80;
+            ctx.strokeStyle = '#6a82fb';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let k = 0; k < NFFT / 2; k++) {
+                const px = margin + (k / (NFFT / 2 - 1)) * plotW;
+                const db = Math.max(magDb[k], dbMin);
+                const py = botTop + botH - ((db - dbMin) / (0 - dbMin)) * botH;
+                if (k === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // dB grid lines
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 0.5;
+            ctx.font = '10px Inter, sans-serif';
+            ctx.fillStyle = '#555';
+            for (let db = 0; db >= dbMin; db -= 20) {
+                const py = botTop + botH - ((db - dbMin) / (0 - dbMin)) * botH;
+                ctx.beginPath();
+                ctx.moveTo(margin, py);
+                ctx.lineTo(W - margin, py);
+                ctx.stroke();
+                ctx.fillText(db + ' dB', W - margin + 5, py + 4);
+            }
+
+            // Labels
+            ctx.font = '12px Inter, sans-serif';
+            ctx.fillStyle = '#f0c27f';
+            ctx.fillText('Windowed Signal (' + windowType + ')', margin, margin - 10);
+            ctx.fillStyle = '#6a82fb';
+            ctx.fillText('Magnitude Spectrum (dB)', margin, botTop - 5);
+            ctx.fillStyle = '#889';
+            ctx.fillText('Frequency (bins: 0 to N/2)', margin + plotW / 2 - 60, H - 5);
+        }
+
+        freqSlider.addEventListener('input', draw);
+
+        function setWindow(type, btn) {
+            windowType = type;
+            document.querySelectorAll('#win-rect,#win-hann,#win-hamming,#win-blackman').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            draw();
+        }
+
+        document.getElementById('win-rect').addEventListener('click', function() { setWindow('rect', this); });
+        document.getElementById('win-hann').addEventListener('click', function() { setWindow('hann', this); });
+        document.getElementById('win-hamming').addEventListener('click', function() { setWindow('hamming', this); });
+        document.getElementById('win-blackman').addEventListener('click', function() { setWindow('blackman', this); });
+
+        draw();
+    })();
+    </script>
+</body>
+</html>

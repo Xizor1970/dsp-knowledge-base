@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Signal Processing — Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html" class="active">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>Digital Signal Processing</h1>
+        <p class="subtitle">From sampling theorems to real-time systems — an interactive exploration of how we transform, analyse, and reshape the signals that define modern technology.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">1965</div>
+                <div class="stat-label">FFT Published</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">10<sup>12</sup></div>
+                <div class="stat-label">Operations/sec (modern DSP)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">44,100</div>
+                <div class="stat-label">CD Sample Rate (Hz)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">N log N</div>
+                <div class="stat-label">FFT Complexity</div>
+            </div>
+        </div>
+
+        <h2>Explore the Foundations</h2>
+        <p>Digital Signal Processing is the mathematical backbone of every phone call you make, every song you stream, every medical image that saves a life, and every radar pulse that keeps aircraft safe. This knowledge base takes you from first principles through to the design techniques used in production systems.</p>
+
+        <div class="card-grid">
+            <a href="fundamentals.html" class="card">
+                <div class="card-number">Chapter 01</div>
+                <h3>Signals & Systems</h3>
+                <p>Continuous vs. discrete, energy vs. power, linearity, time-invariance, and causality — the vocabulary you need before anything else.</p>
+                <span class="card-tag">Foundation</span>
+            </a>
+
+            <a href="sampling.html" class="card">
+                <div class="card-number">Chapter 02</div>
+                <h3>Sampling & Aliasing</h3>
+                <p>The Nyquist-Shannon theorem, why 44.1 kHz, what happens when you break the rules, and how reconstruction filters recover continuous signals.</p>
+                <span class="card-tag">Foundation</span>
+            </a>
+
+            <a href="fourier.html" class="card">
+                <div class="card-number">Chapter 03</div>
+                <h3>Fourier Transform</h3>
+                <p>From the DFT to the FFT — how decomposing signals into sinusoids unlocks everything from MP3 compression to earthquake detection.</p>
+                <span class="card-tag">Core Theory</span>
+            </a>
+
+            <a href="convolution.html" class="card">
+                <div class="card-number">Chapter 04</div>
+                <h3>Convolution & Correlation</h3>
+                <p>The fundamental operation of linear systems. How echoes become mathematics, and why multiplying in frequency equals convolving in time.</p>
+                <span class="card-tag">Core Theory</span>
+            </a>
+
+            <a href="z-transform.html" class="card">
+                <div class="card-number">Chapter 05</div>
+                <h3>Z-Transform</h3>
+                <p>The discrete-time Laplace transform. Poles, zeros, the unit circle, and why transfer functions are the engineer's X-ray into system behaviour.</p>
+                <span class="card-tag">Core Theory</span>
+            </a>
+
+            <a href="filters.html" class="card">
+                <div class="card-number">Chapter 06</div>
+                <h3>Digital Filters</h3>
+                <p>FIR and IIR architectures, the biquad workhorse, linear phase vs. minimum phase, stability, and computational trade-offs.</p>
+                <span class="card-tag">Design</span>
+            </a>
+
+            <a href="filter-design.html" class="card">
+                <div class="card-number">Chapter 07</div>
+                <h3>Filter Design Methods</h3>
+                <p>Butterworth's flat response, Chebyshev's equiripple, Cauer's optimal transitions, Parks-McClellan, and the bilinear transform.</p>
+                <span class="card-tag">Design</span>
+            </a>
+
+            <a href="windowing.html" class="card">
+                <div class="card-number">Chapter 08</div>
+                <h3>Windowing & Spectral Analysis</h3>
+                <p>Why finite observations leak, the zoo of window functions, STFT, spectrograms, and the resolution-leakage trade-off.</p>
+                <span class="card-tag">Analysis</span>
+            </a>
+
+            <a href="multirate.html" class="card">
+                <div class="card-number">Chapter 09</div>
+                <h3>Multirate Processing</h3>
+                <p>Decimation, interpolation, polyphase filters, sample rate conversion, and why your DAC runs at 384 kHz when music was recorded at 48.</p>
+                <span class="card-tag">Advanced</span>
+            </a>
+
+            <a href="applications.html" class="card">
+                <div class="card-number">Chapter 10</div>
+                <h3>Applications</h3>
+                <p>Audio processing, wireless communications, medical imaging, radar, sonar, and machine learning — where theory meets hardware.</p>
+                <span class="card-tag">Real World</span>
+            </a>
+
+            <a href="animations.html" class="card">
+                <div class="card-number">Interactive</div>
+                <h3>Animations & Visualisations</h3>
+                <p>Hands-on: see sampling in action, build filters with sliders, watch convolution unfold, and explore the frequency domain interactively.</p>
+                <span class="card-tag">Hands-On</span>
+            </a>
+        </div>
+
+        <div class="explanation">
+            <h4>How to Use This Site</h4>
+            <p>Each chapter is self-contained — start anywhere that interests you. Gold-bordered blocks explain key concepts, green blocks offer real-world analogies, and blue boxes pose open research questions. Pink frontier sections push beyond established theory into active research.</p>
+            <p>The interactive animations page lets you manipulate parameters and see DSP concepts in real time — no software installation required.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Built for engineers, scientists, and the curious. Zero dependencies, pure HTML/CSS/JS.</p>
+    </footer>
+</body>
+</html>

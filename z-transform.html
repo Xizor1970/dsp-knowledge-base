@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-Transform — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html" class="active">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>The Z-Transform</h1>
+        <p class="subtitle">The discrete-time Laplace transform — poles, zeros, the unit circle, and the engineer's X-ray into system behaviour.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">z = e<sup>j&omega;</sup></div>
+                <div class="stat-label">Unit Circle = DTFT</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">|z| < 1</div>
+                <div class="stat-label">Stable Poles</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">H(z)</div>
+                <div class="stat-label">Transfer Function</div>
+            </div>
+        </div>
+
+        <h2>From Sequences to Functions of z</h2>
+
+        <div class="explanation">
+            <h4>Definition</h4>
+            <p>The Z-transform converts a discrete-time sequence x[n] into a function X(z) of the complex variable z. It's the discrete-time analogue of the Laplace transform: it generalises the DTFT by replacing e<sup>j&omega;</sup> with the complex variable z = re<sup>j&omega;</sup>. This extra degree of freedom (the magnitude r) allows us to analyse sequences whose DTFT doesn't converge, and to represent systems as rational functions with clear geometric interpretation.</p>
+        </div>
+
+        <div class="formula">
+            X(z) = &sum;<sub>n=-&infin;</sub><sup>&infin;</sup> x[n] &middot; z<sup>-n</sup>
+            <span class="label">Bilateral Z-transform</span>
+        </div>
+
+        <div class="formula">
+            X(z) = &sum;<sub>n=0</sub><sup>&infin;</sup> x[n] &middot; z<sup>-n</sup>
+            <span class="label">Unilateral Z-transform (causal signals)</span>
+        </div>
+
+        <div class="analogy">
+            <p>If the DTFT is like evaluating a signal's frequency content at specific test frequencies (points on a circle), the Z-transform is like evaluating it on the entire complex plane — every possible exponential growth/decay rate combined with every frequency. The unit circle is where growth rate = 0 (pure oscillation), so the DTFT is just the Z-transform evaluated on the unit circle.</p>
+        </div>
+
+        <h2>The Region of Convergence (ROC)</h2>
+
+        <div class="explanation">
+            <h4>Where X(z) Exists</h4>
+            <p>The Z-transform sum doesn't converge everywhere. The ROC is the set of z values where the sum converges absolutely. The ROC is always an annular (ring-shaped) region in the z-plane: r₁ < |z| < r₂. The ROC uniquely determines whether a given X(z) corresponds to a causal, anti-causal, or two-sided sequence.</p>
+            <ul>
+                <li><strong>Causal (right-sided) signal:</strong> ROC is the exterior of a circle: |z| > r₁</li>
+                <li><strong>Anti-causal (left-sided) signal:</strong> ROC is the interior: |z| < r₂</li>
+                <li><strong>Two-sided signal:</strong> ROC is a ring: r₁ < |z| < r₂</li>
+                <li><strong>Finite-length signal:</strong> ROC is the entire z-plane (except possibly z=0 and/or z=&infin;)</li>
+            </ul>
+        </div>
+
+        <div class="explanation">
+            <h4>Stability: ROC Must Include the Unit Circle</h4>
+            <p>A system is BIBO stable if and only if its ROC includes the unit circle |z| = 1. For causal systems, this means all poles must be inside the unit circle: |p<sub>k</sub>| < 1. A pole ON the unit circle means marginally stable (oscillates forever); OUTSIDE means unstable (output grows without bound).</p>
+        </div>
+
+        <h2>Poles and Zeros</h2>
+
+        <div class="explanation">
+            <h4>Transfer Functions</h4>
+            <p>Most practical systems have Z-transforms that are ratios of polynomials in z (rational functions):</p>
+        </div>
+
+        <div class="formula">
+            H(z) = (b₀ + b₁z⁻¹ + ... + b<sub>M</sub>z⁻ᴹ) / (1 + a₁z⁻¹ + ... + a<sub>N</sub>z⁻ᴺ)
+            <span class="label">General transfer function (IIR system)</span>
+        </div>
+
+        <div class="explanation">
+            <h4>Geometric Interpretation</h4>
+            <p><strong>Zeros</strong> are values of z where H(z) = 0 — the system completely blocks those frequencies. <strong>Poles</strong> are values where H(z) &rarr; &infin; — the system resonates at those frequencies. The frequency response at any point on the unit circle is determined by the distances and angles from that point to all poles and zeros.</p>
+            <ul>
+                <li>A pole near the unit circle creates a peak in the frequency response (resonance)</li>
+                <li>A zero near the unit circle creates a notch (null)</li>
+                <li>A zero ON the unit circle completely kills that frequency</li>
+                <li>Poles and zeros at the same location cancel each other</li>
+            </ul>
+        </div>
+
+        <div class="analogy">
+            <p>Think of the z-plane as a rubber sheet. Poles are pins pushing the sheet UP from below (mountains), zeros are pins pulling it DOWN (valleys). The frequency response is the height of the sheet along the unit circle. Walk around the circle: when you pass near a pole, the ground rises (frequency boost); near a zero, it dips (frequency cut). The pole-zero pattern IS the filter shape, visible at a glance.</p>
+        </div>
+
+        <h2>Key Z-Transform Pairs</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Signal x[n]</th>
+                    <th>X(z)</th>
+                    <th>ROC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>&delta;[n]</td>
+                    <td>1</td>
+                    <td>All z</td>
+                </tr>
+                <tr>
+                    <td>u[n]</td>
+                    <td>z / (z - 1)</td>
+                    <td>|z| > 1</td>
+                </tr>
+                <tr>
+                    <td>a<sup>n</sup>u[n]</td>
+                    <td>z / (z - a)</td>
+                    <td>|z| > |a|</td>
+                </tr>
+                <tr>
+                    <td>n &middot; a<sup>n</sup>u[n]</td>
+                    <td>az / (z - a)&sup2;</td>
+                    <td>|z| > |a|</td>
+                </tr>
+                <tr>
+                    <td>cos(&omega;₀n)u[n]</td>
+                    <td>z(z - cos&omega;₀) / (z&sup2; - 2z&middot;cos&omega;₀ + 1)</td>
+                    <td>|z| > 1</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Properties</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Time Domain</th>
+                    <th>Z-Domain</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Delay</td>
+                    <td>x[n-1]</td>
+                    <td>z⁻¹X(z)</td>
+                </tr>
+                <tr>
+                    <td>Advance</td>
+                    <td>x[n+1]</td>
+                    <td>zX(z) - zx[0]</td>
+                </tr>
+                <tr>
+                    <td>Convolution</td>
+                    <td>x₁[n] * x₂[n]</td>
+                    <td>X₁(z) &middot; X₂(z)</td>
+                </tr>
+                <tr>
+                    <td>Scaling</td>
+                    <td>a<sup>n</sup>x[n]</td>
+                    <td>X(z/a)</td>
+                </tr>
+                <tr>
+                    <td>Initial value</td>
+                    <td>x[0]</td>
+                    <td>lim<sub>z&rarr;&infin;</sub> X(z)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="explanation">
+            <h4>The Delay Property: z⁻¹ = One Sample Delay</h4>
+            <p>This is perhaps the most practically useful property. In the z-domain, multiplying by z⁻¹ corresponds to delaying by one sample. This turns difference equations into algebraic equations. A filter described by y[n] = x[n] + 0.5x[n-1] - 0.3y[n-1] becomes H(z) = (1 + 0.5z⁻¹)/(1 + 0.3z⁻¹) — immediately revealing poles, zeros, and stability.</p>
+        </div>
+
+        <h2>From Difference Equations to Transfer Functions</h2>
+
+        <div class="explanation">
+            <h4>The Design Loop</h4>
+            <p>The typical workflow:</p>
+            <ol>
+                <li>Specify desired frequency response (e.g., lowpass at 1 kHz)</li>
+                <li>Use design methods to find H(z) — a ratio of polynomials</li>
+                <li>Read off the coefficients (a's and b's)</li>
+                <li>Implement as a difference equation: direct computation</li>
+            </ol>
+            <p>The Z-transform is the language that connects the abstract (frequency response shape) to the concrete (multiplication and addition instructions for a processor).</p>
+        </div>
+
+        <div class="formula">
+            y[n] = &sum;<sub>k=0</sub><sup>M</sup> b<sub>k</sub>x[n-k] - &sum;<sub>k=1</sub><sup>N</sup> a<sub>k</sub>y[n-k]
+            <span class="label">General difference equation (direct form)</span>
+        </div>
+
+        <div class="speculation-box">
+            <p>The Z-transform presupposes uniform sampling — samples equally spaced in time. But many modern applications involve non-uniform sampling: event-driven sensors, irregular observations in finance, or asynchronous digital systems. Extensions like the "non-uniform Z-transform" exist but lack the algebraic elegance of the uniform case. As embedded systems increasingly operate on event-driven data (only sampling when something changes, to save power), we may need a fundamentally new algebraic framework that provides the same pole/zero intuition for non-uniform sequences.</p>
+            <p class="caveat">Non-uniform sampling theory is well-studied (Beurling, Landau density theorems) but hasn't achieved a practical pole-zero design methodology comparable to the Z-transform for uniform sampling.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Can the geometric intuition of poles and zeros be extended to time-varying systems, where pole positions drift over time?</li>
+                <li>What is the most efficient way to compute partial fraction decompositions numerically for very high-order systems without catastrophic cancellation?</li>
+                <li>Is there a natural discrete-time analogue of the "fractional pole" concept emerging in fractional-order control theory?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="convolution.html">&larr; Convolution & Correlation</a>
+            <a href="filters.html" class="next">Digital Filters &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Z-Transform</p>
+    </footer>
+</body>
+</html>

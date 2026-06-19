@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signals & Systems — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html" class="active">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Signals & Systems</h1>
+        <p class="subtitle">The language of DSP — classifying signals, defining system properties, and building the vocabulary that makes everything else precise.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Signal Domains (Time & Frequency)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Key System Properties</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">&infin;</div>
+                <div class="stat-label">Applications</div>
+            </div>
+        </div>
+
+        <h2>What is a Signal?</h2>
+
+        <div class="explanation">
+            <h4>The Broadest Definition</h4>
+            <p>A signal is any quantity that varies with one or more independent variables and carries information. Sound pressure varying over time, pixel intensity varying across an image, stock prices varying across trading days — all signals. DSP concerns itself primarily with signals that are functions of discrete time: sequences of numbers.</p>
+        </div>
+
+        <div class="analogy">
+            <p>Think of a signal like a long receipt from a cash register. Each line is a measurement taken at a specific moment. The receipt doesn't care about the time between measurements — it only records the values, in order. That ordered sequence of numbers IS your discrete-time signal.</p>
+        </div>
+
+        <h3>Continuous vs. Discrete</h3>
+
+        <div class="explanation">
+            <h4>Continuous-Time Signals</h4>
+            <p>A continuous-time signal x(t) is defined for every real value of t. The voltage across an analogue sensor, the pressure wave of a violin note, the temperature in a room — these are all continuous. Mathematically, the domain is the real line.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>Discrete-Time Signals</h4>
+            <p>A discrete-time signal x[n] is defined only at integer values of n. It's a sequence: ..., x[-1], x[0], x[1], x[2], ... We use square brackets to distinguish from continuous signals. These arise naturally when we sample a continuous signal at regular intervals, but they can also be generated computationally — no physical sensor required.</p>
+        </div>
+
+        <div class="formula">
+            x[n] = x_a(nT), &nbsp; where T = 1/f<sub>s</sub> is the sampling period
+            <span class="label">Sampling a continuous signal x_a at rate f_s</span>
+        </div>
+
+        <h3>Signal Classifications</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Type A</th>
+                    <th>Type B</th>
+                    <th>Distinction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Duration</td>
+                    <td>Finite-length</td>
+                    <td>Infinite-length</td>
+                    <td>Does x[n] = 0 outside some range?</td>
+                </tr>
+                <tr>
+                    <td>Energy/Power</td>
+                    <td>Energy signal</td>
+                    <td>Power signal</td>
+                    <td>Finite total energy vs. finite average power</td>
+                </tr>
+                <tr>
+                    <td>Symmetry</td>
+                    <td>Even: x[n] = x[-n]</td>
+                    <td>Odd: x[n] = -x[-n]</td>
+                    <td>Mirror or anti-mirror about n=0</td>
+                </tr>
+                <tr>
+                    <td>Periodicity</td>
+                    <td>Periodic: x[n+N] = x[n]</td>
+                    <td>Aperiodic</td>
+                    <td>Does the pattern repeat exactly?</td>
+                </tr>
+                <tr>
+                    <td>Values</td>
+                    <td>Deterministic</td>
+                    <td>Stochastic (random)</td>
+                    <td>Can you predict the exact value at any n?</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Energy and Power</h3>
+
+        <div class="formula">
+            E = &sum;<sub>n=-&infin;</sub><sup>&infin;</sup> |x[n]|&sup2;
+            <span class="label">Total energy of a discrete-time signal</span>
+        </div>
+
+        <div class="formula">
+            P = lim<sub>N&rarr;&infin;</sub> (1/(2N+1)) &sum;<sub>n=-N</sub><sup>N</sup> |x[n]|&sup2;
+            <span class="label">Average power of a discrete-time signal</span>
+        </div>
+
+        <div class="analogy">
+            <p>Energy signals are like a single clap — all the energy arrives in a burst and then it's gone. You can sum it up to a finite number. Power signals are like a humming refrigerator — the total energy is infinite (it never stops), but the average rate of energy delivery is finite and measurable. A pure sine wave is a power signal; a single pulse is an energy signal.</p>
+        </div>
+
+        <h2>What is a System?</h2>
+
+        <div class="explanation">
+            <h4>Input-Output Machines</h4>
+            <p>A system T{·} takes an input signal x[n] and produces an output signal y[n]. That's it — a rule mapping input sequences to output sequences. An echo effect is a system. A moving average is a system. Your ear is a system. The key question in DSP is: which systems can we analyse mathematically, implement efficiently, and trust to behave predictably?</p>
+        </div>
+
+        <div class="formula">
+            y[n] = T{x[n]}
+            <span class="label">System transforms input to output</span>
+        </div>
+
+        <h3>The Five Key Properties</h3>
+
+        <div class="explanation">
+            <h4>1. Linearity</h4>
+            <p>A system is linear if it obeys superposition: T{ax₁[n] + bx₂[n]} = aT{x₁[n]} + bT{x₂[n]}. Doubling the input doubles the output. Adding two inputs produces the sum of their individual outputs. This is the single most powerful property in DSP — it lets us decompose complex signals into simple parts, process each part, and recombine.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>2. Time-Invariance</h4>
+            <p>A system is time-invariant if delaying the input simply delays the output by the same amount: if y[n] = T{x[n]}, then y[n-k] = T{x[n-k]}. The system's behaviour doesn't change whether you feed it a signal today or tomorrow. Together with linearity, this gives us LTI systems — the bedrock of classical DSP.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>3. Causality</h4>
+            <p>A causal system's output at time n depends only on present and past inputs: x[n], x[n-1], x[n-2], ... — never on future values. All real-time physical systems are causal (you can't react to something that hasn't happened). But offline processing can be non-causal — a video editor can look ahead.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>4. Stability (BIBO)</h4>
+            <p>Bounded-Input Bounded-Output stability: if every bounded input produces a bounded output, the system is stable. A system that amplifies without limit — where a finite input can produce an infinite output — is unstable. For LTI systems, BIBO stability requires that the impulse response h[n] is absolutely summable: &sum;|h[n]| < &infin;.</p>
+        </div>
+
+        <div class="explanation">
+            <h4>5. Memory</h4>
+            <p>A memoryless system's output depends only on the current input: y[n] = f(x[n]). A system with memory looks at past (or future) inputs. A gain control is memoryless. A delay, an accumulator, or any filter has memory.</p>
+        </div>
+
+        <div class="analogy">
+            <p>An LTI system is like a perfectly consistent factory machine: it does exactly the same thing to every product (time-invariant), it handles mixed batches by processing each item independently and combining results (linear), and you can fully characterise it by feeding in one single test piece and observing the result — the impulse response.</p>
+        </div>
+
+        <h2>The Impulse Response</h2>
+
+        <div class="explanation">
+            <h4>The System's DNA</h4>
+            <p>For any LTI system, if you feed in the unit impulse &delta;[n] (which equals 1 at n=0 and 0 everywhere else), the output h[n] = T{&delta;[n]} completely characterises the system. Once you know h[n], you can compute the output for ANY input via convolution. This is why LTI systems are so powerful — one experiment tells you everything.</p>
+        </div>
+
+        <div class="formula">
+            &delta;[n] = { 1, n=0; &nbsp; 0, n&ne;0 }
+            <span class="label">Unit impulse (Kronecker delta)</span>
+        </div>
+
+        <div class="formula">
+            y[n] = x[n] * h[n] = &sum;<sub>k=-&infin;</sub><sup>&infin;</sup> x[k] &middot; h[n-k]
+            <span class="label">Output = Input convolved with impulse response</span>
+        </div>
+
+        <h2>Elementary Signals</h2>
+
+        <div class="explanation">
+            <h4>Building Blocks</h4>
+            <p>A small set of elementary signals serves as the alphabet of DSP:</p>
+            <ul>
+                <li><strong>Unit impulse &delta;[n]:</strong> The "tap" — tests systems, builds other signals</li>
+                <li><strong>Unit step u[n]:</strong> 0 for n<0, 1 for n&ge;0 — models turning something on</li>
+                <li><strong>Complex exponential e<sup>j&omega;n</sup>:</strong> The eigenfunction of LTI systems — goes in as a sinusoid, comes out as a sinusoid (only amplitude and phase change)</li>
+                <li><strong>Real sinusoid cos(&omega;n + &phi;):</strong> The building block of Fourier analysis</li>
+                <li><strong>Exponential decay a<sup>n</sup>u[n]:</strong> Models damping, natural system responses</li>
+            </ul>
+        </div>
+
+        <div class="formula">
+            e<sup>j&omega;n</sup> = cos(&omega;n) + j&middot;sin(&omega;n)
+            <span class="label">Euler's formula — the bridge between exponentials and sinusoids</span>
+        </div>
+
+        <h2>Why LTI Systems Dominate DSP</h2>
+
+        <div class="explanation">
+            <h4>The Power of Superposition</h4>
+            <p>Because LTI systems are linear, we can express any input as a sum of weighted, shifted impulses, process each impulse independently (getting a shifted, weighted copy of h[n]), and sum the results. That sum IS convolution. And because they're time-invariant, we can analyse them in the frequency domain — where convolution becomes simple multiplication. This dual representation (time ↔ frequency) is the fundamental insight that makes DSP tractable.</p>
+        </div>
+
+        <div class="speculation-box">
+            <p>Classical DSP theory assumes LTI systems, but the real world is filled with non-linear, time-varying systems: the human vocal tract changes shape during speech, wireless channels fade and shift, and neural networks are entirely non-linear. Modern DSP increasingly deals with adaptive and non-linear systems — Volterra series, neural network-based filters, and time-varying channel estimators. The question is whether there exists a unified mathematical framework as elegant as LTI theory for these broader system classes, or whether each non-linearity demands its own toolkit.</p>
+            <p class="caveat">Active research in non-linear signal processing continues to yield new mathematical tools (kernel methods, tensor decompositions), but no single framework has achieved the universality of LTI theory.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Can deep learning architectures be understood as a new class of signal processing system with formal guarantees on stability and convergence?</li>
+                <li>Is there a natural "impulse response equivalent" for non-linear systems that provides the same completeness as h[n] does for LTI?</li>
+                <li>How should DSP curricula evolve to balance classical linear theory with the increasingly non-linear reality of modern applications?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="index.html">&larr; Home</a>
+            <a href="sampling.html" class="next">Sampling & Aliasing &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Signals & Systems</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windowing & Spectral Analysis — DSP Knowledge Base</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">DSP</a>
+            <a href="index.html">Home</a>
+            <a href="fundamentals.html">Fundamentals</a>
+            <a href="sampling.html">Sampling</a>
+            <a href="fourier.html">Fourier</a>
+            <a href="convolution.html">Convolution</a>
+            <a href="z-transform.html">Z-Transform</a>
+            <a href="filters.html">Filters</a>
+            <a href="filter-design.html">Filter Design</a>
+            <a href="windowing.html" class="active">Windowing</a>
+            <a href="multirate.html">Multirate</a>
+            <a href="applications.html">Applications</a>
+            <a href="animations.html">Interactive</a>
+        </div>
+    </nav>
+
+    <div class="hero hero-page">
+        <h1>Windowing & Spectral Analysis</h1>
+        <p class="subtitle">Why finite observations leak, the zoo of window functions, and the fundamental trade-off between resolution and leakage.</p>
+    </div>
+
+    <div class="content">
+        <div class="stat-strip">
+            <div class="stat">
+                <div class="stat-number">-13 dB</div>
+                <div class="stat-label">Rectangular Side Lobes</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">-92 dB</div>
+                <div class="stat-label">Blackman-Harris Side Lobes</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">2&times;</div>
+                <div class="stat-label">Hann Main Lobe (vs Rectangular)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">STFT</div>
+                <div class="stat-label">Time-Frequency Analysis</div>
+            </div>
+        </div>
+
+        <h2>The Leakage Problem</h2>
+
+        <div class="explanation">
+            <h4>Why Finite Signals Leak</h4>
+            <p>The DFT assumes the N-sample input repeats forever. If the signal doesn't contain an exact integer number of cycles within N samples, the assumed periodic extension has discontinuities at the boundaries. These discontinuities introduce energy at frequencies not present in the original signal — "spectral leakage." A pure 1000 Hz tone analysed with a non-integer number of cycles will appear to have energy smeared across many bins.</p>
+        </div>
+
+        <div class="analogy">
+            <p>Imagine cutting a strip from an infinite wallpaper pattern. If you cut at exactly one repeat length, the strip tiles perfectly — no seam visible. But cut at a random point and the pattern mismatches at the edges when tiled. Those edge mismatches ARE spectral leakage — fake high-frequency content created by the abrupt cut, not present in the original pattern.</p>
+        </div>
+
+        <h2>Window Functions: Controlling Leakage</h2>
+
+        <div class="explanation">
+            <h4>The Windowing Solution</h4>
+            <p>A window function w[n] multiplies the signal before the DFT, tapering it smoothly to zero at both ends. This eliminates boundary discontinuities — but at a cost: the tapered signal has less frequency resolution (wider main lobe). Every window is a trade-off between:</p>
+            <ul>
+                <li><strong>Main lobe width:</strong> Determines frequency resolution — how close two tones can be and still be distinguished</li>
+                <li><strong>Side lobe level:</strong> Determines dynamic range — how much a strong tone leaks into neighbouring bins, potentially masking weak signals</li>
+            </ul>
+        </div>
+
+        <h3>The Window Zoo</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Window</th>
+                    <th>Main Lobe</th>
+                    <th>Peak Side Lobe</th>
+                    <th>Side Lobe Decay</th>
+                    <th>Best For</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Rectangular</td>
+                    <td>Narrowest (2 bins)</td>
+                    <td>-13 dB</td>
+                    <td>-6 dB/oct</td>
+                    <td>Max resolution, known-integer cycles</td>
+                </tr>
+                <tr>
+                    <td>Hann (Hanning)</td>
+                    <td>4 bins</td>
+                    <td>-31 dB</td>
+                    <td>-18 dB/oct</td>
+                    <td>General-purpose, good all-rounder</td>
+                </tr>
+                <tr>
+                    <td>Hamming</td>
+                    <td>4 bins</td>
+                    <td>-42 dB</td>
+                    <td>-6 dB/oct</td>
+                    <td>Better peak side lobe than Hann</td>
+                </tr>
+                <tr>
+                    <td>Blackman</td>
+                    <td>6 bins</td>
+                    <td>-58 dB</td>
+                    <td>-18 dB/oct</td>
+                    <td>Low leakage general use</td>
+                </tr>
+                <tr>
+                    <td>Blackman-Harris</td>
+                    <td>8 bins</td>
+                    <td>-92 dB</td>
+                    <td>-6 dB/oct</td>
+                    <td>Maximum dynamic range</td>
+                </tr>
+                <tr>
+                    <td>Kaiser</td>
+                    <td>Adjustable (&beta;)</td>
+                    <td>Adjustable</td>
+                    <td>Varies</td>
+                    <td>Tunable trade-off</td>
+                </tr>
+                <tr>
+                    <td>Flat-top</td>
+                    <td>Very wide</td>
+                    <td>-93 dB</td>
+                    <td>Fast</td>
+                    <td>Amplitude accuracy (calibration)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="explanation">
+            <h4>The Kaiser Window</h4>
+            <p>The Kaiser window is uniquely useful because it has an adjustable parameter &beta; that continuously trades between rectangular (&beta;=0, narrowest main lobe) and extreme taper (&beta;&gt;10, very low side lobes). This lets you design the window to match your application's specific resolution/dynamic-range needs. Jim Kaiser derived it as a computationally efficient approximation to the optimal (prolate spheroidal) window.</p>
+        </div>
+
+        <div class="formula">
+            w[n] = 0.5(1 - cos(2&pi;n/(N-1))), &nbsp; 0 &le; n &le; N-1
+            <span class="label">Hann window — the default choice in most applications</span>
+        </div>
+
+        <h2>The Short-Time Fourier Transform (STFT)</h2>
+
+        <div class="explanation">
+            <h4>Time-Frequency Analysis</h4>
+            <p>A single DFT tells you what frequencies exist in a signal but not WHEN they occur. The STFT solves this by computing the DFT on short, overlapping windows that slide through the signal. Each window gives a frequency snapshot at a specific time. Stacking these snapshots creates a spectrogram — a 2D image of time vs. frequency vs. amplitude.</p>
+        </div>
+
+        <div class="formula">
+            X[m, k] = &sum;<sub>n=0</sub><sup>N-1</sup> x[n + mH] &middot; w[n] &middot; e<sup>-j2&pi;kn/N</sup>
+            <span class="label">STFT: window position m, frequency bin k, hop size H</span>
+        </div>
+
+        <div class="explanation">
+            <h4>Parameters</h4>
+            <ul>
+                <li><strong>Window size N:</strong> Larger = better frequency resolution but worse time resolution</li>
+                <li><strong>Hop size H:</strong> Distance between successive windows. H = N/4 (75% overlap) is common for smooth spectrograms</li>
+                <li><strong>Window type:</strong> Hann is standard; must satisfy COLA (Constant Overlap-Add) condition for perfect reconstruction</li>
+            </ul>
+        </div>
+
+        <div class="analogy">
+            <p>The STFT is like reading a book with a magnifying glass. A large magnifier (long window) lets you see many words clearly (good frequency resolution) but you can only focus on one area at a time (poor time resolution). A small magnifier (short window) lets you scan quickly (good time resolution) but each view shows fewer details (poor frequency resolution). You can't escape this trade-off — it's baked into the mathematics.</p>
+        </div>
+
+        <h2>The Uncertainty Principle</h2>
+
+        <div class="explanation">
+            <h4>Time-Frequency Resolution Limit</h4>
+            <p>You cannot have arbitrarily good resolution in both time AND frequency simultaneously. This is the Gabor limit — the signal processing analogue of Heisenberg's uncertainty principle. The product of time resolution &Delta;t and frequency resolution &Delta;f is bounded:</p>
+        </div>
+
+        <div class="formula">
+            &Delta;t &middot; &Delta;f &ge; 1/(4&pi;)
+            <span class="label">Gabor uncertainty principle (Gaussian window achieves equality)</span>
+        </div>
+
+        <div class="explanation">
+            <h4>Practical Implications</h4>
+            <p>For a 44.1 kHz audio signal with a 1024-sample window: frequency resolution = 44100/1024 &asymp; 43 Hz, time resolution = 1024/44100 &asymp; 23 ms. Want to resolve individual piano notes (needing ~10 Hz resolution)? You need ~4400 samples = 100 ms windows. But a 100 ms window can't distinguish events closer together than 100 ms — you'll miss rapid note onsets.</p>
+        </div>
+
+        <h2>Beyond the STFT</h2>
+
+        <div class="explanation">
+            <h4>Multi-Resolution Approaches</h4>
+            <p>The STFT uses the same window size everywhere — same resolution at all frequencies. But many signals need variable resolution: long windows for low frequencies (which have long periods) and short windows for high frequencies (which change quickly). Solutions include:</p>
+            <ul>
+                <li><strong>Wavelet transform:</strong> Uses short windows at high frequencies, long at low — constant relative bandwidth (octave bands)</li>
+                <li><strong>Constant-Q transform:</strong> Frequency bins logarithmically spaced (matching musical pitch) with Q = f/&Delta;f constant</li>
+                <li><strong>Reassignment methods:</strong> Sharpen the STFT by moving energy to its true centre of gravity within each time-frequency cell</li>
+            </ul>
+        </div>
+
+        <h2>Spectrograms in Practice</h2>
+
+        <div class="explanation">
+            <h4>The Workhorse of Audio Analysis</h4>
+            <p>Spectrograms are everywhere: speech recognition (mel spectrograms → neural networks), music analysis (pitch tracking, instrument identification), bioacoustics (whale song, bird identification), vibration monitoring (bearing fault signatures), and communications (signal identification, interference detection). The mel spectrogram — a spectrogram with frequency warped to match human pitch perception — is the standard input to modern speech and music AI systems.</p>
+        </div>
+
+        <div class="speculation-box">
+            <p>The STFT's fixed time-frequency grid may be fundamentally mismatched to how audio signals are actually structured. Music lives on a log-frequency axis (octaves), speech has time-varying formant rates, and transients are impulse-like events that defy windowed analysis entirely. Learned time-frequency representations — where a neural network discovers the optimal decomposition for a downstream task — are beginning to outperform hand-designed transforms in some applications (SampleRNN, LEAF filterbanks). Are we approaching the end of the era where humans design signal decompositions, and entering one where they're learned from data?</p>
+            <p class="caveat">Learned representations currently excel in classification tasks but lack the mathematical guarantees (perfect reconstruction, parsimony, interpretability) that make classical transforms trustworthy in safety-critical systems.</p>
+        </div>
+
+        <div class="question-box">
+            <ul>
+                <li>Is there a transform that achieves the uncertainty limit at ALL time-frequency points simultaneously (not just for Gaussian signals)?</li>
+                <li>Can sparsity-promoting transforms (like those used in compressed sensing) be computed as efficiently as the FFT?</li>
+                <li>How should spectral analysis tools adapt for non-stationary signals where the statistics change faster than a single window length?</li>
+            </ul>
+        </div>
+
+        <div class="page-nav">
+            <a href="filter-design.html">&larr; Filter Design Methods</a>
+            <a href="multirate.html" class="next">Multirate Processing &rarr;</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>DSP Knowledge Base — Windowing & Spectral Analysis</p>
+    </footer>
+</body>
+</html>
